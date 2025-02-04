@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SuperPro - Plataforma de Dicas</title>
+    <!-- Font Awesome para ícones -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Reset e estilos base */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Roboto", sans-serif;
+        background: #f7f7f7;
+        color: #333333;
+      }
+      :root {
+        --primary: #10b981;
+        --secondary: #34d399;
+        --error: #ef4444;
+        --success: #10b981;
+        --text: #333333;
+        --white: #ffffff;
+        --shadow: rgba(0, 0, 0, 0.1);
+      }
+      
+      /* =========================
+         Sidebar Personalizada
+      =========================== */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 260px;
+        height: 100vh;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: var(--white);
+        padding: 20px;
+        transition: transform 0.3s ease;
+        z-index: 1000;
+      }
+      /* Para mobile, a sidebar fica oculta por padrão */
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.active {
+          transform: translateX(0);
+        }
+      }
+      .sidebar-header {
+        background: rgba(0, 0, 0, 0.2);
+        padding: 20px;
+        border-radius: 4px;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .sidebar-header h1 {
+        font-family: "Montserrat", sans-serif;
+        font-size: 1.8rem;
+      }
+      .sidebar-header .close-btn {
+        background: none;
+        border: none;
+        color: var(--white);
+        font-size: 1.5rem;
+        cursor: pointer;
+        display: none;
+      }
+      @media (max-width: 768px) {
+        .sidebar-header .close-btn {
+          display: block;
+        }
+      }
+      .sidebar nav {
+        margin-top: 20px;
+      }
+      .sidebar nav ul {
+        list-style: none;
+      }
+      .sidebar nav ul li {
+        margin: 15px 0;
+      }
+      .sidebar nav ul li a {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: var(--white);
+        font-size: 1.1rem;
+        padding: 10px 15px;
+        border-radius: 4px;
+        transition: background 0.3s ease;
+      }
+      .sidebar nav ul li a:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .sidebar nav ul li a i {
+        margin-right: 10px;
+      }
+      
+      /* Botão de Menu Mobile (apenas em telas pequenas) */
+      .mobile-menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--white);
+        font-size: 1.8rem;
+        cursor: pointer;
+        position: absolute;
+        left: 40px;
+        top: 40px;
+        z-index: 1100;
+      }
+      @media (max-width: 768px) {
+        .mobile-menu-btn {
+          display: block;
+        }
+      }
+      
+      /* Overlay para Mobile */
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease;
+        z-index: 900;
+      }
+      .overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+      
+      /* =========================
+         Conteúdo Principal
+      =========================== */
+      .main-content {
+        margin-left: 260px;
+        padding: 20px;
+        transition: margin-left 0.3s ease;
+      }
+      @media (max-width: 768px) {
+        .main-content {
+          margin-left: 0;
+        }
+      }
+      header {
+        background: var(--primary);
+        color: var(--white);
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+      header h1 {
+        font-family: "Montserrat", sans-serif;
+        font-size: 2rem;
+      }
+      
+      /* =========================
+         Seção de Busca
+      =========================== */
+      .search-section {
+        background: var(--white);
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px var(--shadow);
+        margin-bottom: 20px;
+      }
+      .search-section form {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+      }
+      .form-group {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+      }
+      .form-group label {
+        font-size: 1rem;
+        color: var(--text);
+        margin-bottom: 5px;
+      }
+      .form-group input[type="date"] {
+        padding: 10px;
+        font-size: 1rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        width: 100%;
+      }
+      .search-section form button {
+        padding: 10px 20px;
+        font-size: 1rem;
+        border: none;
+        border-radius: 4px;
+        background: var(--primary);
+        color: var(--white);
+        cursor: pointer;
+        transition: background 0.3s ease;
+        align-self: flex-end;
+        margin-top: 24px;
+      }
+      .search-section form button:hover {
+        background: var(--secondary);
+      }
+      
+      /* =========================
+         Cards de Dicas
+      =========================== */
+      .results-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+      }
+      .card {
+        background: var(--white);
+        border-radius: 5px;
+        box-shadow: 0 2px 4px var(--shadow);
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        transition: transform 0.3s ease;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+      }
+      .card-header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+      }
+      .card-header img {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+        border-radius: 50%;
+        border: 1px solid #ccc;
+      }
+      .card-header .team-info {
+        flex: 1;
+      }
+      .card-header .team-info h2 {
+        font-family: "Montserrat", sans-serif;
+        font-size: 1.2rem;
+        color: var(--text);
+        margin-bottom: 5px;
+      }
+      .card-header .team-info p {
+        font-size: 0.9rem;
+        color: #555555;
+      }
+      .card-body {
+        font-size: 1rem;
+        color: var(--text);
+      }
+      .card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.9rem;
+      }
+      
+      .badge {
+        padding: 5px 10px;
+        border-radius: 3px;
+        font-weight: bold;
+        font-size: 0.8rem;
+      }
+      .badge.correct {
+        background: var(--success);
+        color: var(--white);
+      }
+      .badge.incorrect {
+        background: var(--error);
+        color: var(--white);
+      }
+      footer {
+        text-align: center;
+        margin-top: 20px;
+        padding: 10px;
+        background: var(--primary);
+        color: var(--white);
+        border-radius: 5px;
+      }
+      
+      /* =========================
+         Ajustes para Mobile
+      =========================== */
+      @media (max-width: 768px) {
+        .sidebar-header h1 {
+          text-align: center;
+          width: 100%;
+        }
+        /* A sidebar já está oculta por padrão no mobile */
+        .sidebar.active {
+          transform: translateX(0);
+        }
+        /* O botão hamburger é exibido somente em telas pequenas */
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar Personalizada -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h1>SuperPro</h1>
+        <button class="close-btn" id="close-btn">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <nav>
+        <ul>
+          <li>
+            <a href="index3.html">
+              <i class="fas fa-home"></i>
+              Página Inicial
+            </a>
+          </li>
+          <li>
+            <a href="jogos.html">
+              <i class="fas fa-compass"></i>
+              Explorar Jogos
+            </a>
+          </li>
+          <li>
+            <a href="dicas.html">
+              <i class="fas fa-lightbulb"></i>
+              Dicas Inteligência Avançada
+            </a>
+          </li>
+          <li>
+            <!-- Adicionado o id "logout-btn" para identificar o botão de Sair -->
+            <a href="#" id="logout-btn">
+              <i class="fas fa-sign-out-alt"></i>
+              Sair
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+    
+    <!-- Overlay para Mobile -->
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- Botão de Menu Mobile (apenas visível em telas pequenas) -->
+    <button class="mobile-menu-btn" id="mobile-menu-btn">
+      <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+      <header>
+        <h1>SuperPro</h1>
+      </header>
+      
+      <!-- Seção de Busca -->
+      <section class="search-section">
+        <form id="search-form">
+          <div class="form-group">
+            <label for="dateFrom">Selecione a Data:</label>
+            <input type="date" id="dateFrom" name="dateFrom" required />
+          </div>
+          <button type="submit">
+            <i class="fas fa-search"></i> Buscar Dicas
+          </button>
+        </form>
+      </section>
+      
+      <!-- Seção de Resultados (cards) -->
+      <section class="results-section" id="results">
+        <!-- Os cards serão injetados via JavaScript -->
+      </section>
+      
+      <!-- Rodapé -->
+      <footer>
+        <p>&copy; 2025 SuperPro. Todos os direitos reservados.</p>
+      </footer>
+    </div>
+    
+    <!-- JavaScript -->
+    <script>
+      // Utilizamos o servidor proxy para buscar as dicas
+      const BASE_URL = "https://superpro2025.onrender.com";
+      
+      // Função para obter a data atual no formato "YYYY-MM-DD"
+      function getCurrentDate() {
+        var today = new Date();
+        var year = today.getFullYear();
+        var month = String(today.getMonth() + 1).padStart(2, "0");
+        var day = String(today.getDate()).padStart(2, "0");
+        return year + "-" + month + "-" + day;
+      }
+
+      // Função para registrar logs na página
+      var logDiv = document.getElementById("log");
+      function log(msg) {
+        logDiv.textContent += msg + "\n";
+        logDiv.scrollTop = logDiv.scrollHeight;
+      }
+
+      // Função para buscar dicas via servidor proxy
+      async function fetchDailyGames() {
+        var today = getCurrentDate();
+        var endpoint = "/api/sports?dateFrom=" + encodeURIComponent(today) + "&dateTo=" + encodeURIComponent(today);
+        var url = BASE_URL + endpoint;
+        try {
+          log("Buscando jogos do dia...");
+          var response = await fetch(url, { method: "GET" });
+          if (!response.ok) {
+            throw new Error("Erro: " + response.status);
+          }
+          var data = await response.json();
+          log("Jogos recebidos: " + (Array.isArray(data) ? data.length : 0));
+          return data;
+        } catch (error) {
+          log("Erro ao buscar jogos: " + error);
+          return [];
+        }
+      }
+
+      // Função para buscar dados históricos de uma equipe via API‑Sports
+      async function fetchTeamHistoricalData(teamId) {
+        var season = 2024;
+        var url = "https://v3.football.api-sports.io/fixtures?team=" + teamId + "&season=" + season + "&last=30";
+        try {
+          log("Buscando dados históricos para o time ID " + teamId + "...");
+          var response = await fetch(url, { method: "GET", headers: {
+            "x-rapidapi-host": "v3.football.api-sports.io",
+            "x-rapidapi-key": "b77014eeea8142d354a2e0479bcc2d08"
+          }});
+          if (!response.ok) {
+            throw new Error("Erro: " + response.status);
+          }
+          var data = await response.json();
+          var vitorias = 0, empates = 0, derrotas = 0, golsFavor = 0, golsContra = 0;
+          if (Array.isArray(data.response)) {
+            data.response.forEach(function(fixture) {
+              if (fixture.fixture.status.short === "FT") {
+                var teamScore = 0, opponentScore = 0;
+                if (fixture.teams.home.id === teamId) {
+                  teamScore = fixture.goals.home;
+                  opponentScore = fixture.goals.away;
+                } else if (fixture.teams.away.id === teamId) {
+                  teamScore = fixture.goals.away;
+                  opponentScore = fixture.goals.home;
+                }
+                golsFavor += teamScore;
+                golsContra += opponentScore;
+                if (teamScore > opponentScore) {
+                  vitorias++;
+                } else if (teamScore === opponentScore) {
+                  empates++;
+                } else {
+                  derrotas++;
+                }
+              }
+            });
+          }
+          var ranking = 0, campeonatosGanhados = 0, form = "";
+          return { jogos: 30, vitorias: vitorias, empates: empates, derrotas: derrotas, golsFavor: golsFavor, golsContra: golsContra, ranking: ranking, campeonatosGanhados: campeonatosGanhados, form: form };
+        } catch (error) {
+          log("Erro ao buscar dados históricos para o time " + teamId + ": " + error);
+          return { jogos: 30, vitorias: 0, empates: 0, derrotas: 0, golsFavor: 0, golsContra: 0, ranking: 0, campeonatosGanhados: 0, form: "" };
+        }
+      }
+
+      // Função para buscar head-to-head entre duas equipes via API‑Sports
+      async function fetchHeadToHead(teamAId, teamBId) {
+        var season = 2024;
+        var url = "https://v3.football.api-sports.io/fixtures/headtohead?h2h=" + teamAId + "-" + teamBId + "&season=" + season + "&last=15";
+        try {
+          log("Buscando head-to-head para " + teamAId + " vs " + teamBId + "...");
+          var response = await fetch(url, { method: "GET", headers: {
+            "x-rapidapi-host": "v3.football.api-sports.io",
+            "x-rapidapi-key": "b77014eeea8142d354a2e0479bcc2d08"
+          }});
+          if (!response.ok) {
+            throw new Error("Erro: " + response.status);
+          }
+          var data = await response.json();
+          var winsA = 0, winsB = 0, draws = 0;
+          if (Array.isArray(data.response)) {
+            data.response.forEach(function(fixture) {
+              if (fixture.fixture.status.short === "FT") {
+                if (fixture.teams.home.id === teamAId) {
+                  if (fixture.goals.home > fixture.goals.away) {
+                    winsA++;
+                  } else if (fixture.goals.home < fixture.goals.away) {
+                    winsB++;
+                  } else {
+                    draws++;
+                  }
+                } else if (fixture.teams.home.id === teamBId) {
+                  if (fixture.goals.home > fixture.goals.away) {
+                    winsB++;
+                  } else if (fixture.goals.home < fixture.goals.away) {
+                    winsA++;
+                  } else {
+                    draws++;
+                  }
+                }
+              }
+            });
+          }
+          return { jogos: 15, winsA: winsA, winsB: winsB, draws: draws };
+        } catch (error) {
+          log("Erro ao buscar head-to-head: " + error);
+          return { jogos: 15, winsA: 0, winsB: 0, draws: 0 };
+        }
+      }
+
+      // Função para converter a forma (ex: "WWLWD") em escore numérico
+      function formScore(formStr) {
+        if (!formStr) return 0;
+        var score = 0;
+        for (var i = 0; i < formStr.length; i++) {
+          var char = formStr.charAt(i);
+          if (char === "W") score += 1;
+          else if (char === "L") score -= 1;
+        }
+        return score;
+      }
+
+      // Função para ajustar a data para o horário de Brasília (GMT -3)
+      function ajustarDataGMT3(dateStr) {
+        var dateObj = new Date(dateStr);
+        return dateObj.toLocaleString("pt-BR", {
+          timeZone: "America/Sao_Paulo",
+          hour12: false,
+          timeZoneName: "short"
+        });
+      }
+
+      // Função para calcular o índice de confiança baseado na dica
+      function calcularIndiceConfiancaPorTip(jogo, teamA, teamB, headToHead) {
+        var tip = jogo["1x2"];
+        var oddHome = parseFloat(jogo.home_win_odds) || 0;
+        var oddDraw = parseFloat(jogo.draw_odds) || 0;
+        var oddAway = parseFloat(jogo.away_win_odds) || 0;
+        var pHome = oddHome > 0 ? 1 / oddHome : 0;
+        var pDraw = oddDraw > 0 ? 1 / oddDraw : 0;
+        var pAway = oddAway > 0 ? 1 / oddAway : 0;
+        var totalP = pHome + pDraw + pAway;
+        var norm_pHome = totalP > 0 ? pHome / totalP : 0;
+        var norm_pDraw = totalP > 0 ? pDraw / totalP : 0;
+        var norm_pAway = totalP > 0 ? pAway / totalP : 0;
+        
+        var baseProb = 0;
+        if (tip === "1") {
+          baseProb = norm_pHome;
+        } else if (tip === "X") {
+          baseProb = norm_pDraw;
+        } else if (tip === "2") {
+          baseProb = norm_pAway;
+        } else if (tip === "1X") {
+          baseProb = norm_pHome + norm_pDraw;
+        } else if (tip === "2X") {
+          baseProb = norm_pAway + norm_pDraw;
+        } else if (tip === "12") {
+          baseProb = norm_pHome + norm_pAway;
+        } else {
+          baseProb = 0;
+        }
+        
+        var taxaA = teamA.vitorias / teamA.jogos;
+        var taxaB = teamB.vitorias / teamB.jogos;
+        var taxaAdjustment = (taxaA - taxaB) / 2;
+        
+        var difA = (teamA.golsFavor - teamA.golsContra) / teamA.jogos;
+        var difB = (teamB.golsFavor - teamB.golsContra) / teamB.jogos;
+        var golsAdjustment = (difA - difB) / 10;
+        
+        var h2hAdjustment = 0;
+        if (headToHead.jogos > 0) {
+          if (tip === "1" || tip === "1X") {
+            h2hAdjustment = ((headToHead.winsA - headToHead.winsB) / headToHead.jogos) * 0.1;
+          } else if (tip === "2" || tip === "2X") {
+            h2hAdjustment = ((headToHead.winsB - headToHead.winsA) / headToHead.jogos) * 0.1;
+          }
+        }
+        
+        var rankingAdjustment = 0;
+        if (tip === "1" || tip === "1X") {
+          rankingAdjustment = (teamB.ranking - teamA.ranking) / 100;
+        } else if (tip === "2" || tip === "2X") {
+          rankingAdjustment = (teamA.ranking - teamB.ranking) / 100;
+        }
+        
+        var titulosAdjustment = 0;
+        if (tip === "1" || tip === "1X") {
+          titulosAdjustment = (teamA.campeonatosGanhados - teamB.campeonatosGanhados) / 50;
+        } else if (tip === "2" || tip === "2X") {
+          titulosAdjustment = (teamB.campeonatosGanhados - teamA.campeonatosGanhados) / 50;
+        }
+        
+        var formaA = formScore(teamA.form || "");
+        var formaB = formScore(teamB.form || "");
+        var formaAdjustment = (formaA - formaB) / 10;
+        
+        var ajusteHistorico = taxaAdjustment + golsAdjustment + h2hAdjustment + rankingAdjustment + titulosAdjustment + formaAdjustment;
+        
+        var probAjustada = baseProb + ajusteHistorico;
+        probAjustada = Math.min(Math.max(probAjustada, 0), 1);
+        
+        var minhasOdds = probAjustada > 0 ? 1 / probAjustada : Infinity;
+        var marketOdd = parseFloat(getOddTip(jogo));
+        var oddsAdjustment = 0;
+        if (minhasOdds !== Infinity && marketOdd > 0) {
+          var diff = marketOdd - minhasOdds;
+          oddsAdjustment = (diff / marketOdd) * 0.1;
+        }
+        
+        var indiceFinal = probAjustada + oddsAdjustment;
+        indiceFinal = Math.min(Math.max(indiceFinal, 0), 1);
+        return indiceFinal;
+      }
+
+      // Função para extrair a odd da dica conforme o tipo
+      function getOddTip(jogo) {
+        var tip = jogo["1x2"];
+        var odd;
+        if (tip === "1") {
+          odd = jogo.home_win_odds;
+        } else if (tip === "X") {
+          odd = jogo.draw_odds;
+        } else if (tip === "2") {
+          odd = jogo.away_win_odds;
+        } else if (tip === "12") {
+          odd = jogo["12_odds"];
+        } else if (tip === "1X") {
+          odd = jogo["1x_odds"];
+        } else if (tip === "2X") {
+          odd = jogo["2x_odds"];
+        } else {
+          odd = "N/A";
+        }
+        return odd;
+      }
+
+      // Evento do formulário de busca
+      document.getElementById("search-form").addEventListener("submit", function (event) {
+        event.preventDefault();
+        var dateFrom = document.getElementById("dateFrom").value;
+        if (!dateFrom) {
+          alert("Por favor, selecione uma data.");
+          return;
+        }
+        var resultsSection = document.getElementById("results");
+        resultsSection.innerHTML = "<p>Carregando dicas...</p>";
+        var apiUrl =
+          BASE_URL +
+          "/api/sports?dateFrom=" +
+          encodeURIComponent(dateFrom) +
+          "&dateTo=" +
+          encodeURIComponent(dateFrom);
+        fetch(apiUrl)
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error("Erro: " + response.status);
+            }
+            return response.json();
+          })
+          .then(function (data) {
+            if (!Array.isArray(data) || data.length === 0) {
+              resultsSection.innerHTML =
+                "<p>Nenhuma dica encontrada para o período selecionado.</p>";
+              return;
+            }
+            renderCards(data);
+          })
+          .catch(function (error) {
+            console.error("Erro ao buscar dicas:", error);
+            resultsSection.innerHTML =
+              '<p class="error">Ocorreu um erro. Tente novamente mais tarde.</p>';
+          });
+      });
+
+      // Função para renderizar os cards com as dicas
+      async function renderCards(predictions) {
+        var resultsSection = document.getElementById("results");
+        resultsSection.innerHTML = "";
+        predictions.forEach(function (prediction) {
+          var card = document.createElement("div");
+          card.className = "card";
+          
+          // Cabeçalho do Card com logotipos e informações dos times
+          var cardHeader = document.createElement("div");
+          cardHeader.className = "card-header";
+          
+          // Logotipo do time da casa
+          var homeLogo = document.createElement("img");
+          homeLogo.src = prediction.homeLogo ? prediction.homeLogo.replace(/\\\//g, "/") : "https://via.placeholder.com/50?text=Casa";
+          homeLogo.alt = prediction.homeTeam || "Time da Casa";
+          cardHeader.appendChild(homeLogo);
+          
+          // Logotipo do time visitante
+          var awayLogo = document.createElement("img");
+          awayLogo.src = prediction.awayLogo ? prediction.awayLogo.replace(/\\\//g, "/") : "https://via.placeholder.com/50?text=Fora";
+          awayLogo.alt = prediction.awayTeam || "Time Visitante";
+          cardHeader.appendChild(awayLogo);
+          
+          // Informações dos times e competição (a data foi removida visualmente)
+          var teamInfo = document.createElement("div");
+          teamInfo.className = "team-info";
+          var title = document.createElement("h2");
+          var homeTeam = prediction.homeTeam || "Time da Casa";
+          var awayTeam = prediction.awayTeam || "Time Visitante";
+          title.textContent = homeTeam + " vs " + awayTeam;
+          teamInfo.appendChild(title);
+          var league = document.createElement("p");
+          league.textContent = prediction.competition_full || "Competição";
+          teamInfo.appendChild(league);
+          cardHeader.appendChild(teamInfo);
+          card.appendChild(cardHeader);
+          
+          // Corpo do Card: previsão, odd e probabilidades
+          var cardBody = document.createElement("div");
+          cardBody.className = "card-body";
+          var forecastText = getPredictionText(prediction["1x2"]);
+          cardBody.innerHTML = "<p><strong>Previsão:</strong> " + forecastText + "</p>";
+          var odds = getOdds(prediction);
+          cardBody.innerHTML += "<p><strong>Odd:</strong> " + odds + "</p>";
+          card.appendChild(cardBody);
+          
+          // Rodapé do Card: status e, se finalizado, o resultado
+          var cardFooter = document.createElement("div");
+          cardFooter.className = "card-footer";
+          var statusSpan = document.createElement("span");
+          statusSpan.textContent = "Status: " + (prediction.status || "N/A");
+          cardFooter.appendChild(statusSpan);
+          if (prediction.status === "FT") {
+            var resultBadge = document.createElement("span");
+            if (verifyPrediction(prediction)) {
+              resultBadge.className = "badge correct";
+              resultBadge.textContent = "Correta";
+            } else {
+              resultBadge.className = "badge incorrect";
+              resultBadge.textContent = "Incorreta";
+            }
+            cardFooter.appendChild(resultBadge);
+          }
+          card.appendChild(cardFooter);
+          
+          resultsSection.appendChild(card);
+        });
+      }
+
+      // Função para formatar a data no formato DD/MM/YYYY HH:MM
+      function formatDate(dateStr) {
+        if (!dateStr) return "Data não disponível";
+        var dateObj = new Date(dateStr);
+        var day = String(dateObj.getDate()).padStart(2, "0");
+        var month = String(dateObj.getMonth() + 1).padStart(2, "0");
+        var year = dateObj.getFullYear();
+        var hours = String(dateObj.getHours()).padStart(2, "0");
+        var minutes = String(dateObj.getMinutes()).padStart(2, "0");
+        return day + "/" + month + "/" + year + " " + hours + ":" + minutes;
+      }
+
+      // Função para retornar a descrição da previsão com base no código
+      function getPredictionText(code) {
+        switch (code) {
+          case "1":
+            return "Vitória do Time da Casa";
+          case "2":
+            return "Vitória do Time Visitante";
+          case "X":
+            return "Empate";
+          case "12":
+            return "Vitória de Qualquer Time";
+          case "1X":
+            return "Vitória do Time da Casa ou Empate";
+          case "2X":
+            return "Vitória do Time Visitante ou Empate";
+          default:
+            return "Previsão não disponível";
+        }
+      }
+
+      // Função para retornar a odd com base no tipo de previsão
+      function getOdds(prediction) {
+        switch (prediction["1x2"]) {
+          case "1":
+            return prediction.home_win_odds || "N/A";
+          case "2":
+            return prediction.away_win_odds || "N/A";
+          case "X":
+            return prediction.draw_odds || "N/A";
+          case "12":
+            return prediction["12_odds"] || "N/A";
+          case "1X":
+            return prediction["1x_odds"] || "N/A";
+          case "2X":
+            return prediction["2x_odds"] || "N/A";
+          default:
+            return "N/A";
+        }
+      }
+
+      // Função para verificar se a previsão foi correta com base no resultado do jogo
+      function verifyPrediction(prediction) {
+        var homeGoals = parseInt(prediction.home_goals, 10);
+        var awayGoals = parseInt(prediction.away_goals, 10);
+        var result = homeGoals > awayGoals ? "1" : homeGoals < awayGoals ? "2" : "X";
+        var forecast = prediction["1x2"];
+        if (forecast === "12") {
+          return result === "1" || result === "2";
+        }
+        return forecast.includes(result);
+      }
+
+      // Eventos para a Sidebar Mobile
+      document.addEventListener("DOMContentLoaded", function () {
+        var sidebar = document.getElementById("sidebar");
+        var mobileMenuBtn = document.getElementById("mobile-menu-btn");
+        var closeBtn = document.getElementById("close-btn");
+        var overlay = document.getElementById("overlay");
+        
+        mobileMenuBtn.addEventListener("click", function () {
+          sidebar.classList.add("active");
+          overlay.classList.add("active");
+          mobileMenuBtn.style.display = "none";
+        });
+        
+        closeBtn.addEventListener("click", function () {
+          sidebar.classList.remove("active");
+          overlay.classList.remove("active");
+          mobileMenuBtn.style.display = "block";
+        });
+        
+        overlay.addEventListener("click", function () {
+          sidebar.classList.remove("active");
+          overlay.classList.remove("active");
+          mobileMenuBtn.style.display = "block";
+        });
+        
+        // Evento para o botão "Sair" que desloga o usuário
+        var logoutBtn = document.getElementById("logout-btn");
+        logoutBtn.addEventListener("click", function (event) {
+          event.preventDefault();
+          // Exemplo de lógica de logout:
+          // Remover token de autenticação (se houver) do localStorage
+          localStorage.removeItem("authToken");
+          // Redirecionar para a página de login (substitua "login.html" pela URL desejada)
+          window.location.href = "index.html";
+        });
+      });
+    </script>
+  </body>
+</html>

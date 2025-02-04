@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SuperPro - Análises e Gráficos</title>
+    <!-- Link para Font Awesome (para ícones) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Link para Google Fonts (Roboto e Montserrat para o título) -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto&display=swap" rel="stylesheet">
+    <!-- Favicon vazio para evitar erro 404 -->
+    <link rel="icon" href="data:,">
+    <!-- Estilos CSS -->
+    <style>
+        /* Reset básico para garantir consistência entre navegadores */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* Variáveis de cores */
+        :root {
+            --color-primary: #1e3a8a; /* Azul escuro */
+            --color-secondary: #3b82f6; /* Azul médio */
+            --color-accent: #10b981; /* Verde */
+            --color-bg: #f3f4f6; /* Cinza claro */
+            --color-text: #1f2937; /* Cinza escuro */
+            --color-white: #ffffff;
+            --color-filter-bg: #ffffff;
+            --color-filter-border: #d1d5db;
+            --color-button-bg: #3b82f6;
+            --color-button-hover: #1e40af;
+            --color-button-text: #ffffff;
+            --color-button-secondary-bg: #e5e7eb;
+            --color-button-secondary-text: #374151;
+            --color-card-border: #d1d5db;
+            --color-card-hover: #e5e7eb;
+            --color-table-header: #3b82f6;
+            --color-table-text: #1f2937;
+            --color-table-border: #d1d5db;
+            --color-cabecalho-fundo: var(--color-white);
+            --color-cabecalho-sombra: rgba(0, 0, 0, 0.1);
+            --color-sidebar-fundo: var(--color-primary);
+            --color-sidebar-ativa: var(--color-secondary);
+            --color-loading: #3b82f6; /* Azul para carregamento */
+            --color-error: #ef4444; /* Vermelho para erros */
+            --color-success: #10b981; /* Verde para sucessos */
+        }
+
+        /* Estilos para a Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 220px; /* Largura da sidebar */
+            height: 100%;
+            background-color: var(--color-sidebar-fundo);
+            color: var(--color-white);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--color-sidebar-ativa);
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            /* Mantendo apenas o texto do logo */
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--color-white);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: none; /* Esconder em desktop */
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding-top: 20px;
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--color-white);
+            text-decoration: none;
+            transition: background 0.2s;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .sidebar-nav a:hover {
+            background-color: var(--color-sidebar-ativa);
+        }
+
+        .sidebar-nav i {
+            margin-right: 10px;
+        }
+
+        /* Overlay para mobile */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 900;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 220px; /* Ajustar conforme a largura da sidebar */
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: var(--color-bg);
+            transition: margin-left 0.3s ease-in-out;
+            padding: 20px; /* Adicionar padding para não ficar grudado nas bordas */
+            overflow-y: auto;
+        }
+
+        /* Cabeçalho */
+        .header {
+            height: 70px; /* Aumento da altura para acomodar novos elementos */
+            background-color: var(--color-cabecalho-fundo);
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Centraliza os itens */
+            padding: 0 30px;
+            box-shadow: 0 2px 4px var(--color-cabecalho-sombra);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            position: relative; /* Para posicionamento absoluto do botão de menu */
+        }
+
+        /* Botão de Menu para Mobile */
+        .menu-btn {
+            position: absolute;
+            left: 20px;
+            background: none;
+            border: none;
+            color: var(--color-text);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Logo no Cabeçalho */
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        /* Conteúdo de Análises */
+        .analyses-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: block;
+        }
+
+        .analyses-content h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            color: var(--color-text);
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* Gráficos */
+        .chart-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 40px auto;
+        }
+
+        /* Tabela de Métricas */
+        .metrics-table {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: var(--color-white);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--color-filter-border);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .metrics-table h3 {
+            font-size: 1.5rem;
+            color: var(--color-text);
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .metrics-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .metrics-table th, .metrics-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--color-table-border);
+        }
+
+        .metrics-table th {
+            background-color: var(--color-table-header);
+            color: var(--color-white);
+        }
+
+        .metrics-table tr:hover {
+            background-color: var(--color-card-hover);
+        }
+
+        .metrics-table td {
+            color: var(--color-table-text);
+        }
+
+        /* Mensagens de Erro e Carregamento */
+        .message {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.1rem;
+        }
+
+        .message.error {
+            color: var(--color-error);
+        }
+
+        .message.success {
+            color: var(--color-success);
+        }
+
+        .loading {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.1rem;
+            color: var(--color-loading);
+        }
+
+        /* Footer */
+        .footer {
+            height: 40px; /* Redução da altura do rodapé */
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            margin-top: auto;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 220px;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .overlay.active {
+                display: block;
+            }
+
+            .close-btn {
+                display: block;
+            }
+
+            .menu-btn {
+                position: absolute;
+                left: 20px;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .analyses-content {
+                padding: 10px;
+            }
+
+            .chart-container {
+                max-width: 100%;
+                margin: 0 auto 20px auto;
+            }
+
+            .metrics-table {
+                max-width: 100%;
+                padding: 15px;
+            }
+
+            .logo-text {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+
+    <!-- Inclusão do Chart.js (versão ESM) -->
+    <script type="module">
+        // Importar as funções necessárias do SDK do Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            getDocs, 
+            query, 
+            where, 
+            documentId 
+        } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            signOut, 
+            onAuthStateChanged, 
+            updateProfile 
+        } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { Chart, registerables } from 'https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.esm.js';
+
+        // Registrar os componentes do Chart.js
+        Chart.register(...registerables);
+
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyC8147QhLWMcT0NdJGMCZhxS1nDpTOErpI",
+            authDomain: "superpro-8d45e.firebaseapp.com",
+            projectId: "superpro-8d45e",
+            storageBucket: "superpro-8d45e.appspot.com",
+            messagingSenderId: "732335019424",
+            appId: "1:732335019424:web:5a743efffe3d62cc9980c5"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // Variáveis para armazenamento de dados e métricas
+        let selectedTips = [];
+        let metrics = {
+            acertos: 0, // Ganhou
+            erros: 0,    // Perdeu
+            accuracy: '0.00'
+        };
+
+        let accuracyChartInstance = null;
+
+        /**
+         * Função para exibir ou esconder o indicador de carregamento
+         * @param {boolean} mostrar - Indica se deve mostrar ou esconder o carregamento
+         */
+        const mostrarCarregamento = (mostrar) => {
+            const loadingElement = document.getElementById('loading');
+            if (loadingElement) {
+                if (mostrar) {
+                    loadingElement.style.display = 'block';
+                } else {
+                    loadingElement.style.display = 'none';
+                }
+            }
+        };
+
+        /**
+         * Função para exibir mensagens de erro ou sucesso
+         * @param {string} mensagem - Mensagem a ser exibida
+         * @param {string} tipo - Tipo da mensagem ('error' ou 'success')
+         */
+        const exibirMensagem = (mensagem, tipo) => {
+            const messageElement = document.getElementById('message');
+            if (messageElement) {
+                messageElement.innerText = mensagem;
+                if (tipo === 'error') {
+                    messageElement.classList.remove('success');
+                    messageElement.classList.add('error');
+                } else if (tipo === 'success') {
+                    messageElement.classList.remove('error');
+                    messageElement.classList.add('success');
+                }
+            }
+        };
+
+        /**
+         * Função para limpar mensagens anteriores
+         */
+        const limparMensagens = () => {
+            const messageElement = document.getElementById('message');
+            if (messageElement) {
+                messageElement.innerText = '';
+                messageElement.classList.remove('error', 'success');
+            }
+        };
+
+        /**
+         * Função para buscar dicas selecionadas pelo usuário
+         * @param {Object} user - Objeto do usuário autenticado
+         */
+        const fetchSelectedTips = async (user) => {
+            mostrarCarregamento(true);
+            limparMensagens();
+
+            try {
+                const selecoesRef = collection(db, 'users', user.uid, 'selecoes');
+                const selecoesSnapshot = await getDocs(selecoesRef);
+
+                if (selecoesSnapshot.empty) {
+                    exibirMensagem('Nenhuma dica selecionada. Por favor, selecione dicas na página "Minhas Seleções".', 'error');
+                    document.getElementById('analyses-content').innerHTML = '<p>Nenhuma dica selecionada para análise.</p>';
+                    return;
+                }
+
+                // Usando doc.id como dicaId, assumindo que selecoes docs têm IDs correspondentes aos tips
+                const dicaIds = selecoesSnapshot.docs.map(doc => doc.id);
+
+                console.log('IDs das Dicas Selecionadas:', dicaIds);
+
+                // Firestore permite no máximo 10 itens no operador 'in'
+                const batchSize = 10;
+                let selectedTipsData = [];
+
+                for (let i = 0; i < dicaIds.length; i += batchSize) {
+                    const batchIds = dicaIds.slice(i, i + batchSize);
+                    const q = query(collection(db, 'tips'), where(documentId(), 'in', batchIds));
+                    const tipsSnapshot = await getDocs(q);
+                    tipsSnapshot.forEach(tipDoc => {
+                        selectedTipsData.push(tipDoc.data());
+                    });
+                }
+
+                selectedTips = selectedTipsData;
+
+                if (selectedTips.length === 0) {
+                    exibirMensagem('Nenhuma dica válida selecionada para análise.', 'error');
+                    document.getElementById('analyses-content').innerHTML = '<p>Nenhuma dica válida selecionada para análise.</p>';
+                    return;
+                }
+
+                calcularMetricas(selectedTips);
+                renderizarMetricas();
+                renderizarGraficoAcuracia();
+            } catch (error) {
+                console.error('Erro ao buscar dicas selecionadas:', error);
+                exibirMensagem('Erro ao carregar as análises. Por favor, tente novamente mais tarde.', 'error');
+                document.getElementById('analyses-content').innerHTML = '<p>Erro ao carregar as análises. Por favor, tente novamente mais tarde.</p>';
+            } finally {
+                mostrarCarregamento(false);
+            }
+        };
+
+        /**
+         * Função para calcular métricas
+         * @param {Array} tips - Array de objetos contendo as dicas selecionadas
+         */
+        const calcularMetricas = (tips) => {
+            metrics.acertos = 0;
+            metrics.erros = 0;
+
+            tips.forEach(tip => {
+                const resultado = tip['Resultado'] ? tip['Resultado'].toLowerCase() : '';
+                if (resultado === 'ganhou') metrics.acertos += 1;
+                if (resultado === 'perdeu') metrics.erros += 1;
+            });
+
+            // Calcular acurácia
+            const totalValid = metrics.acertos + metrics.erros;
+            metrics.accuracy = totalValid > 0 ? ((metrics.acertos / totalValid) * 100).toFixed(2) : '0.00';
+        };
+
+        /**
+         * Função para renderizar a tabela de métricas
+         */
+        const renderizarMetricas = () => {
+            document.getElementById('acertos-value').innerText = `${metrics.acertos}`;
+            document.getElementById('erros-value').innerText = `${metrics.erros}`;
+            document.getElementById('accuracy-value').innerText = `${metrics.accuracy}%`;
+        };
+
+        /**
+         * Função para renderizar o gráfico de acurácia
+         */
+        const renderizarGraficoAcuracia = () => {
+            const ctx = document.getElementById('accuracyChart').getContext('2d');
+            if (accuracyChartInstance) {
+                accuracyChartInstance.destroy();
+            }
+            accuracyChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Ganhou', 'Perdeu'],
+                    datasets: [{
+                        data: [metrics.acertos, metrics.erros],
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.7)', // Verde para Ganhou
+                            'rgba(220, 38, 38, 0.7)'   // Vermelho para Perdeu
+                        ],
+                        borderColor: [
+                            'rgba(16, 185, 129, 1)',
+                            'rgba(220, 38, 38, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Resultado das Apostas'
+                        }
+                    }
+                },
+            });
+        };
+
+        /**
+         * Função para fazer login
+         */
+        const login = async () => {
+            const email = prompt("Digite seu e-mail para login:");
+            const password = prompt("Digite sua senha:");
+
+            if (!email || !password) {
+                exibirMensagem("Email e senha são obrigatórios para login.", "error");
+                return;
+            }
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                exibirMensagem("Login realizado com sucesso!", "success");
+                // As análises serão atualizadas automaticamente via listener de autenticação
+            } catch (error) {
+                exibirMensagem(`Erro ao fazer login: ${error.message}`, "error");
+            }
+        };
+
+        /**
+         * Função para registrar novo usuário
+         */
+        const register = async () => {
+            const email = prompt("Digite seu e-mail para registro:");
+            const password = prompt("Digite sua senha:");
+            const username = prompt("Digite seu nome de usuário:");
+
+            if (!email || !password || !username) {
+                exibirMensagem("Email, senha e nome de usuário são obrigatórios para registro.", "error");
+                return;
+            }
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await updateProfile(userCredential.user, {
+                    displayName: username
+                });
+                exibirMensagem("Registro realizado com sucesso!", "success");
+                // As análises serão atualizadas automaticamente via listener de autenticação
+            } catch (error) {
+                exibirMensagem(`Erro ao registrar: ${error.message}`, "error");
+            }
+        };
+
+        /**
+         * Função para realizar logout
+         */
+        const logout = async () => {
+            try {
+                await signOut(auth);
+                exibirMensagem("Logout realizado com sucesso!", "success");
+                window.location.href = 'index.html'; // Redireciona para index.html após logout
+            } catch (error) {
+                console.error('Erro ao fazer logout:', error);
+                exibirMensagem("Ocorreu um erro ao fazer logout. Por favor, tente novamente.", "error");
+            }
+        };
+
+        /**
+         * Função para atualizar a interface de usuário baseada no estado de autenticação
+         * @param {Object} user - Objeto do usuário autenticado
+         */
+        const updateAuthUI = (user) => {
+            const logoutBtnSidebar = document.querySelectorAll('.logout-btn');
+            if (user) {
+                logoutBtnSidebar.forEach(btn => {
+                    btn.href = "#";
+                    btn.onclick = (e) => {
+                        e.preventDefault();
+                        logout();
+                    };
+                });
+            } else {
+                logoutBtnSidebar.forEach(btn => {
+                    btn.href = "#";
+                    btn.onclick = (e) => {
+                        e.preventDefault();
+                        // Implementar lógica de login/registro
+                        const action = prompt("Digite 'login' para login ou 'register' para registro:");
+                        if (action && action.toLowerCase() === 'login') {
+                            login();
+                        } else if (action && action.toLowerCase() === 'register') {
+                            register();
+                        } else {
+                            exibirMensagem("Ação inválida. Por favor, tente novamente.", "error");
+                        }
+                    };
+                });
+            }
+        };
+
+        /**
+         * Listener para mudanças na autenticação
+         */
+        onAuthStateChanged(auth, (user) => {
+            updateAuthUI(user);
+            if (user) {
+                fetchSelectedTips(user);
+            } else {
+                document.getElementById('analyses-content').innerHTML = `
+                    <p>Por favor, faça login para ver as análises.</p>
+                `;
+            }
+        });
+
+        /**
+         * Função para abrir a sidebar (mobile)
+         */
+        const openSidebar = () => {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.add('active');
+                overlay.classList.add('active');
+            }
+        };
+
+        /**
+         * Função para fechar a sidebar (mobile)
+         */
+        const closeSidebarFunc = () => {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+        };
+
+        /**
+         * Função de inicialização da página
+         */
+        const init = () => {
+            // Event listener para o botão de menu (abrir sidebar)
+            const menuBtn = document.getElementById('menu-btn');
+            if (menuBtn) {
+                menuBtn.addEventListener('click', openSidebar);
+            }
+
+            // Event listener para o botão de fechar (fechar sidebar)
+            const closeBtn = document.getElementById('close-btn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeSidebarFunc);
+            }
+
+            // Event listener para o overlay (fechar sidebar ao clicar fora)
+            const overlay = document.getElementById('overlay');
+            if (overlay) {
+                overlay.addEventListener('click', closeSidebarFunc);
+            }
+
+            // Verificar estado de autenticação ao carregar
+            const user = auth.currentUser;
+            if (user) {
+                fetchSelectedTips(user);
+            }
+        };
+
+        // Chamar a função de inicialização ao carregar a página
+        window.onload = init;
+    </script>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h1 class="logo">SuperPro</h1>
+            <button class="close-btn" id="close-btn" aria-label="Fechar Sidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li>
+                    <a href="index3.html" aria-label="Home">
+                        <i class="fas fa-home"></i>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="analise.html" aria-label="Análises">
+                        <i class="fas fa-chart-bar"></i>
+                        Análises
+                    </a>
+                </li>
+                <li>
+                    <a href="jogos.html" aria-label="Explorar">
+                        <i class="fas fa-compass"></i>
+                        Explorar
+                    </a>
+                </li>
+                <li>
+                    <a href="selecao.html" aria-label="Minhas Seleções">
+                        <i class="fas fa-list"></i>
+                        Minhas Seleções
+                    </a>
+                </li>
+                <li>
+                    <a href="perfil.html" aria-label="Perfil">
+                        <i class="fas fa-user"></i>
+                        Perfil
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="logout-btn" aria-label="Sair">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Sair
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Overlay para mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <button class="menu-btn" id="menu-btn" aria-label="Abrir Sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="logo-text">SuperPro</h1>
+        </header>
+
+        <!-- Conteúdo de Análises -->
+        <main class="analyses-content" id="analyses-content">
+            <h2>Análises de Apostas</h2>
+
+            <!-- Mensagem de Erro ou Sucesso -->
+            <div id="message" class="message"></div>
+
+            <!-- Indicador de Carregamento -->
+            <div id="loading" class="loading" style="display: none;">
+                <i class="fas fa-spinner fa-spin"></i> Carregando análises...
+            </div>
+
+            <!-- Gráfico de Acurácia -->
+            <div class="chart-container">
+                <canvas id="accuracyChart"></canvas>
+            </div>
+
+            <!-- Tabela de Métricas -->
+            <div class="metrics-table">
+                <h3>Resumo das Métricas</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Métrica</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Ganhou</td>
+                            <td id="acertos-value">0</td>
+                        </tr>
+                        <tr>
+                            <td>Perdeu</td>
+                            <td id="erros-value">0</td>
+                        </tr>
+                        <tr>
+                            <td>Acurácia</td>
+                            <td id="accuracy-value">0.00%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            © 2025 SuperPro. Todos os direitos reservados.
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil do Usuário - SuperPro</title>
+    <!-- Link para ícones (Font Awesome) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Link para Google Fonts (Roboto e Montserrat para o título) -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto&display=swap" rel="stylesheet">
+    <!-- Estilos CSS -->
+    <style>
+        /* Reset básico para garantir consistência entre navegadores */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* Variáveis de cores para facilitar a manutenção e consistência */
+        :root {
+            --cor-primaria: #1e3a8a; /* Azul escuro */
+            --cor-secundaria: #3b82f6; /* Azul médio */
+            --cor-accent: #10b981; /* Verde */
+            --cor-fundo: #f3f4f6; /* Cinza claro */
+            --cor-texto: #1f2937; /* Cinza escuro */
+            --cor-branca: #ffffff;
+            --cor-filtro-fundo: #ffffff;
+            --cor-filtro-borda: #d1d5db;
+            --cor-botao-fundo: #3b82f6;
+            --cor-botao-hover: #1e40af;
+            --cor-botao-texto: #ffffff;
+            --cor-botao-secundario-fundo: #e5e7eb;
+            --cor-botao-secundario-texto: #374151;
+            --cor-cartao-borda: #d1d5db;
+            --cor-cartao-hover: #e5e7eb;
+            --cor-tabela-cabecalho: #3b82f6;
+            --cor-tabela-texto: #1f2937;
+            --cor-tabela-borda: #d1d5db;
+            --cor-cabecalho-fundo: var(--cor-branca);
+            --cor-cabecalho-sombra: rgba(0, 0, 0, 0.1);
+            --cor-sidebar-fundo: var(--cor-primaria);
+            --cor-sidebar-ativa: var(--cor-secundaria);
+            --cor-sucesso-borda: #10b981; /* Verde para acerto */
+            --cor-erro-borda: #ef4444; /* Vermelho para erro */
+        }
+
+        /* Estilos para a Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 220px; /* Largura da sidebar */
+            height: 100%;
+            background-color: var(--cor-sidebar-fundo);
+            color: var(--cor-branca);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--cor-sidebar-ativa);
+            border-bottom: 1px solid var(--cor-filtro-borda); /* Borda sutil */
+        }
+
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            /* Mantendo apenas o texto do logo */
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--cor-branca);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: none; /* Esconder em desktop */
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding-top: 20px;
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--cor-branca);
+            text-decoration: none;
+            transition: background 0.2s, border 0.2s;
+            border-radius: 4px;
+            font-size: 1rem;
+            border: 1px solid transparent; /* Borda transparente para manter o alinhamento */
+            flex-shrink: 0;
+        }
+
+        .sidebar-nav a:hover {
+            background-color: var(--cor-sidebar-ativa);
+            border: 1px solid var(--cor-secundaria); /* Borda sutil no hover */
+        }
+
+        .sidebar-nav i {
+            margin-right: 10px;
+        }
+
+        /* Overlay para mobile */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            z-index: 900;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 220px; /* Ajustar conforme a largura da sidebar */
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: var(--cor-fundo);
+            transition: margin-left 0.3s ease-in-out;
+            padding: 20px; /* Adicionar padding para não ficar grudado nas bordas */
+            overflow-y: auto;
+        }
+
+        /* Cabeçalho */
+        .header {
+            height: 70px; /* Aumento da altura para acomodar novos elementos */
+            background-color: var(--cor-cabecalho-fundo);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 2px 4px var(--cor-cabecalho-sombra);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--cor-filtro-borda); /* Borda sutil */
+            flex-shrink: 0; /* Evitar encolhimento */
+            flex-wrap: wrap; /* Permitir que os elementos envolvam */
+            position: relative; /* Para posicionamento absoluto do menu button */
+        }
+
+        /* Botão de Menu para Mobile */
+        .menu-btn {
+            display: none; /* Esconder em desktop */
+            background: none;
+            border: none;
+            color: var(--cor-texto);
+            font-size: 1.5rem;
+            cursor: pointer;
+            position: absolute; /* Posicionar absoluto */
+            left: 20px; /* Alinhar à esquerda */
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        /* Logo no Cabeçalho */
+        .header-logo {
+            display: flex;
+            align-items: center;
+            flex: 1 1 200px; /* Flex-grow, flex-shrink, flex-basis */
+            justify-content: flex-start; /* Alinhar à esquerda no desktop */
+        }
+
+        .header-logo a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--cor-primaria);
+        }
+
+        .logo-text {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        /* Barra de Busca */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            flex: 2 1 300px; /* Flex-grow, flex-shrink, flex-basis */
+            max-width: 400px; /* Aumentar para mais espaço */
+            margin: 0 30px;
+            width: 100%; /* Garantir que ocupe a largura disponível */
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 5px 12px; /* Aumentado para 32px de altura */
+            border: 1px solid var(--cor-filtro-borda);
+            border-right: none;
+            border-radius: 4px 0 0 4px;
+            outline: none;
+            font-size: 0.9rem; /* Aumentado para 0.9rem */
+            color: var(--cor-texto);
+            height: 32px; /* Definido para controlar a altura */
+        }
+
+        .search-bar button {
+            padding: 5px 12px; /* Aumentado para 32px de altura */
+            border: 1px solid transparent; /* Borda transparente para manter o alinhamento */
+            background-color: var(--cor-botao-fundo);
+            color: var(--cor-botao-texto);
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            transition: background-color 0.3s, border 0.3s;
+            font-size: 0.9rem; /* Aumentado para 0.9rem */
+            height: 32px; /* Definido para controlar a altura */
+        }
+
+        .search-bar button:hover {
+            background-color: var(--cor-botao-hover);
+            border: 1px solid var(--cor-secundaria); /* Borda sutil no hover */
+        }
+
+        /* Formulário de Perfil */
+        .profile-form {
+            background-color: var(--cor-branca);
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid var(--cor-cartao-borda);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .profile-form h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2rem;
+            color: var(--cor-texto);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .profile-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .profile-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--cor-texto);
+        }
+
+        .profile-form input[type="text"] {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--cor-filtro-borda);
+            border-radius: 4px;
+            outline: none;
+            font-size: 1rem;
+            color: var(--cor-texto);
+        }
+
+        .profile-form button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--cor-botao-fundo);
+            color: var(--cor-botao-texto);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .profile-form button:hover {
+            background-color: var(--cor-botao-hover);
+        }
+
+        /* Footer */
+        .footer {
+            height: 40px; /* Redução da altura do rodapé */
+            background-color: var(--cor-primaria);
+            color: var(--cor-branca);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            margin-top: auto;
+            border-top: 1px solid var(--cor-filtro-borda); /* Borda sutil */
+        }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 180px;
+            }
+
+            .main-content {
+                margin-left: 180px;
+            }
+
+            .header {
+                padding: 0 20px;
+            }
+
+            .search-bar {
+                margin: 10px 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 220px;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .overlay.active {
+                display: block;
+            }
+
+            .close-btn {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .feed {
+                padding: 10px;
+            }
+
+            /* Ocultar a barra de busca */
+            .search-bar {
+                display: none;
+            }
+
+            /* Botão de Menu visível apenas em mobile */
+            .menu-btn {
+                display: block;
+                position: absolute; /* Posicionar absoluto */
+                left: 20px; /* Alinhar à esquerda */
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+            /* Centralizar o logo */
+            .header-logo {
+                justify-content: center; /* Centralizar o logo */
+                flex: 1;
+            }
+
+            /* Ajustar layout da barra de busca para mobile */
+            .search-bar {
+                display: none; /* Garantir que a barra de busca esteja oculta */
+            }
+        }
+
+        /* Adição de espaçamento entre o cabeçalho e as dicas para telas maiores */
+        @media (min-width: 769px) {
+            .feed {
+                margin-top: 30px; /* Ajuste conforme necessário */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h1 class="logo">SuperPro</h1>
+            <button class="close-btn" id="close-btn" aria-label="Fechar Sidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <ul>
+                <li>
+                    <a href="index3.html" aria-label="Home">
+                        <i class="fas fa-home"></i>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="analise.html" aria-label="Análises">
+                        <i class="fas fa-chart-bar"></i>
+                        Análises
+                    </a>
+                </li>
+                <li>
+                    <a href="jogos.html" aria-label="Explorar">
+                        <i class="fas fa-compass"></i>
+                        Explorar
+                    </a>
+                </li>
+                <li>
+                    <a href="selecao.html" aria-label="Minhas Seleções">
+                        <i class="fas fa-list"></i>
+                        Minhas Seleções
+                    </a>
+                </li>
+                <li>
+                    <a href="perfil.html" aria-label="Perfil">
+                        <i class="fas fa-user"></i>
+                        Perfil
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="logout-btn" aria-label="Sair">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Sair
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Overlay para mobile -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <!-- Botão de Menu para Mobile -->
+            <button class="menu-btn" id="menu-btn" aria-label="Abrir Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Logo no Cabeçalho -->
+            <div class="header-logo">
+                <a href="index3.html" aria-label="SuperPro Home">
+                    <span class="logo-text">SuperPro</span>
+                </a>
+            </div>
+            <!-- Barra de Busca -->
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Buscar análises ou tipsters..." aria-label="Buscar">
+                <button id="search-btn" aria-label="Buscar">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <!-- Ícones de Notificação e Perfil Removidos -->
+        </header>
+
+        <!-- Formulário de Perfil -->
+        <main class="feed" id="feed">
+            <div class="profile-form">
+                <h2>Meu Perfil</h2>
+                <!-- Removido o container da imagem de perfil -->
+                <form id="formulario-perfil">
+                    <div class="form-group">
+                        <label for="nome-usuario">Nome:</label>
+                        <input type="text" id="nome-usuario" name="nome-usuario" required>
+                    </div>
+                    <!-- Removida a opção de upload de foto -->
+                    <button type="submit">Salvar</button>
+                </form>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            © 2025 SuperPro. Todos os direitos reservados.
+        </footer>
+    </div>
+
+    <!-- Firebase SDK (Abordagem Modular) -->
+    <script type="module">
+        // Importar as funções necessárias do SDK do Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc, 
+            setDoc, 
+            updateDoc,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { 
+            getAuth, 
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyC8147QhLWMcT0NdJGMCZhxS1nDpTOErpI",
+            authDomain: "superpro-8d45e.firebaseapp.com",
+            projectId: "superpro-8d45e",
+            storageBucket: "superpro-8d45e.appspot.com",
+            messagingSenderId: "732335019424",
+            appId: "1:732335019424:web:5a743efffe3d62cc9980c5"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const bancoDeDados = getFirestore(app);
+        const autenticacao = getAuth(app);
+
+        // ------------------- FORMATAR PRIMEIRA LETRA -------------------
+        const capitalizeFirstLetter = (string) => {
+            if (typeof string !== 'string') return '';
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        };
+
+        // ------------------- INICIALIZAR ESTRUTURA DO FIRESTORE -------------------
+        const inicializarEstruturaDoFirestore = async (usuario) => {
+            if (!usuario) return;
+
+            const idDoUsuario = usuario.uid;
+            const referenciaDoUsuario = doc(bancoDeDados, 'users', idDoUsuario);
+            const documentoDoUsuario = await getDoc(referenciaDoUsuario);
+
+            if (!documentoDoUsuario.exists()) {
+                // Criar documento de usuário se não existir
+                await setDoc(referenciaDoUsuario, {
+                    email: usuario.email,
+                    criadoEm: serverTimestamp(),
+                    nome: '',
+                    fotoURL: ''
+                    // Adicione outros campos necessários aqui
+                });
+                console.log(`Documento de usuário criado para UID: ${idDoUsuario}`);
+            } else {
+                console.log(`Documento de usuário já existe para UID: ${idDoUsuario}`);
+            }
+        };
+
+        // ------------------- CARREGAR DADOS DE PERFIL -------------------
+        const carregarDadosDePerfil = async (usuario) => {
+            const idDoUsuario = usuario.uid;
+            const referenciaDoUsuario = doc(bancoDeDados, 'users', idDoUsuario);
+            const documentoDoUsuario = await getDoc(referenciaDoUsuario);
+
+            if (documentoDoUsuario.exists()) {
+                const dados = documentoDoUsuario.data();
+                const nome = dados.nome || '';
+                const fotoURL = dados.fotoURL || 'https://picsum.photos/150'; // Alterado para Picsum
+
+                document.getElementById('nome-usuario').value = nome;
+                // Removido o elemento da foto de perfil
+                // Armazenar a URL da foto atual para uso posterior
+                window.campoFotoAtual = fotoURL;
+                console.log(`Dados de perfil carregados: Nome - ${nome}, FotoURL - ${fotoURL}`);
+            }
+        };
+
+        // ------------------- ATUALIZAR DADOS DE PERFIL -------------------
+        const atualizarPerfil = async (usuario, nome) => {
+            const idDoUsuario = usuario.uid;
+            const referenciaDoUsuario = doc(bancoDeDados, 'users', idDoUsuario);
+            
+            // Preparar dados para atualização
+            const dadosParaAtualizar = { nome: nome };
+
+            // Atualizar Firestore com o novo nome
+            try {
+                await updateDoc(referenciaDoUsuario, dadosParaAtualizar);
+                // Removido o alert para uma experiência mais suave
+                console.log("Perfil atualizado.");
+                // Atualizar a interface conforme necessário
+            } catch (erro) {
+                console.error('Erro ao atualizar o perfil:', erro);
+                alert("Ocorreu um erro ao atualizar o perfil. Por favor, tente novamente.");
+            }
+        };
+
+        // ------------------- AUTENTICAÇÃO -------------------
+        // Atualizar UI com base no estado de autenticação
+        const atualizarInterfaceAutenticacao = (usuario) => {
+            const botoesDeLogout = document.querySelectorAll('.logout-btn');
+            botoesDeLogout.forEach(btn => {
+                if (usuario) {
+                    btn.textContent = "Sair";
+                    btn.href = "#";
+                    btn.onclick = async (evento) => {
+                        evento.preventDefault();
+                        await efetuarLogout();
+                    };
+                } else {
+                    btn.textContent = "Login";
+                    btn.href = "index.html"; // Redirecionar para a página de login (index.html)
+                }
+            });
+        };
+
+        // Função para efetuar logout
+        const efetuarLogout = async () => {
+            try {
+                await signOut(autenticacao);
+                // Removido o alert para uma experiência mais suave
+                console.log("Usuário deslogado.");
+                window.location.href = 'index.html'; // Redireciona para index.html após logout
+            } catch (erro) {
+                console.error('Erro ao fazer logout:', erro);
+                alert("Ocorreu um erro ao fazer logout. Por favor, tente novamente.");
+            }
+        };
+
+        // Listener para mudanças no estado de autenticação
+        onAuthStateChanged(autenticacao, async (usuario) => {
+            console.log('onAuthStateChanged chamado. Usuário:', usuario);
+            if (usuario) {
+                console.log(`Usuário autenticado: ${usuario.uid}`);
+                await inicializarEstruturaDoFirestore(usuario);
+                await carregarDadosDePerfil(usuario);
+            } else {
+                console.log('Nenhum usuário autenticado');
+                const container = document.querySelector('.profile-form');
+                if (container) {
+                    container.innerHTML = '<p>Por favor, faça login para acessar o perfil.</p>';
+                }
+            }
+            atualizarInterfaceAutenticacao(usuario);
+        });
+
+        // ------------------- MANIPULAÇÃO DO FORMULÁRIO -------------------
+        const formularioPerfil = document.getElementById('formulario-perfil');
+
+        formularioPerfil.addEventListener('submit', async (evento) => {
+            evento.preventDefault();
+
+            const usuario = autenticacao.currentUser;
+            if (!usuario) {
+                alert("Por favor, faça login para atualizar o perfil.");
+                return;
+            }
+
+            const nome = document.getElementById('nome-usuario').value.trim();
+
+            console.log(`Nome a ser atualizado: ${nome}`);
+
+            // Atualizar o perfil
+            await atualizarPerfil(usuario, nome);
+        });
+
+        // ------------------- INICIALIZAÇÃO -------------------
+        const inicializarPagina = () => {
+            // Sidebar toggle para mobile
+            const botaoMenu = document.getElementById('menu-btn');
+            const botaoFechar = document.getElementById('close-btn');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+
+            if (botaoMenu) {
+                botaoMenu.addEventListener('click', () => {
+                    sidebar.classList.add('active');
+                    overlay.classList.add('active');
+                });
+            }
+
+            if (botaoFechar) {
+                botaoFechar.addEventListener('click', () => {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            }
+
+            if (overlay) {
+                overlay.addEventListener('click', () => {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            }
+        };
+
+        window.onload = () => {
+            inicializarPagina(); // Função já existente para a Sidebar
+            // Não necessário chamar outras funções nesta página
+        };
+    </script>
+</body>
+</html>

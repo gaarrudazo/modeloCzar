@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SuperPro - Calendário de Jogos</title>
+  <!-- Ícones (Font Awesome) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Roboto&display=swap" rel="stylesheet">
+  <!-- Estilos CSS -->
+  <style>
+    /* Reset Básico */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    /* Variáveis de Cores */
+    :root {
+      --cor-primaria: #10b981;
+      --cor-secundaria: #34d399;
+      --cor-accent: #2563eb;
+      --cor-fundo: #f3f4f6;
+      --cor-texto: #1f2937;
+      --cor-branca: #ffffff;
+      --color-sidebar-fundo: var(--cor-primaria);
+      --color-sidebar-texto: var(--cor-branca);
+      --color-close-btn: var(--cor-branca);
+      --color-menu-btn: #000000;
+      --cor-filtro-fundo: #d1d5db;
+      --cor-cabecalho-fundo: var(--cor-primaria);
+      --cor-cabecalho-sombra: rgba(0, 0, 0, 0.1);
+    }
+
+    /* ===============================
+       Sidebar
+    =============================== */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 260px;
+      height: 100vh;
+      background-color: var(--color-sidebar-fundo);
+      color: var(--color-sidebar-texto);
+      padding: 20px;
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+
+    .sidebar-header {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 20px;
+      border-radius: 4px;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .sidebar-header h1 {
+      font-family: "Montserrat", sans-serif;
+      font-size: 1.8rem;
+      margin: 0;
+    }
+
+    .sidebar-header .close-btn {
+      background: none;
+      border: none;
+      color: var(--color-close-btn);
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: none;
+    }
+
+    .sidebar nav {
+      margin-top: 20px;
+    }
+
+    .sidebar nav ul {
+      list-style: none;
+    }
+
+    .sidebar nav ul li {
+      margin: 15px 0;
+    }
+
+    .sidebar nav ul li a {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      color: var(--color-sidebar-texto);
+      font-size: 1.1rem;
+      padding: 10px 15px;
+      border-radius: 4px;
+      transition: background 0.3s ease;
+    }
+
+    .sidebar nav ul li a:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .sidebar nav ul li a i {
+      margin-right: 10px;
+    }
+
+    /* ===============================
+       Overlay para Mobile
+    =============================== */
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      z-index: 900;
+    }
+
+    /* ===============================
+       Main Content
+    =============================== */
+    .main-content {
+      margin-left: 260px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: var(--cor-fundo);
+      transition: margin-left 0.3s ease-in-out;
+      padding: 0 20px 20px 20px;
+      overflow-y: auto;
+    }
+
+    .header {
+      background-color: var(--cor-cabecalho-fundo);
+      color: var(--cor-branca);
+      padding: 20px 30px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 4px var(--cor-cabecalho-sombra);
+      border-bottom: 1px solid var(--cor-filtro-fundo);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--color-menu-btn);
+      font-size: 1.5rem;
+      cursor: pointer;
+      position: fixed;
+      left: 20px;
+      top: 20px;
+      z-index: 1100;
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+    }
+
+    .header-logo a {
+      text-decoration: none;
+      color: var(--cor-branca);
+    }
+
+    .logo-text {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+
+    @media (max-width: 1024px) {
+      .sidebar {
+        width: 220px;
+      }
+      .main-content {
+        margin-left: 220px;
+        padding: 0 15px 15px 15px;
+      }
+      .header {
+        padding: 10px 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        width: 220px;
+      }
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      .overlay.active {
+        display: block;
+      }
+      .main-content {
+        margin-left: 0;
+        padding: 60px 20px 20px 20px;
+      }
+      .menu-btn {
+        display: block;
+      }
+      .header-logo {
+        display: none;
+      }
+      .header {
+        margin-bottom: 20px;
+      }
+      .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+      }
+      .sidebar-header h1 {
+        font-size: 1.5rem;
+        margin: 0;
+      }
+      .sidebar-header .close-btn {
+        display: block;
+      }
+    }
+
+    .footer {
+      height: 40px;
+      background-color: var(--cor-primaria);
+      color: var(--cor-branca);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      margin-top: auto;
+      border-top: 1px solid var(--cor-filtro-fundo);
+    }
+  </style>
+
+  <!-- Favicon (vazio para evitar erro 404) -->
+  <link rel="icon" href="data:,">
+  
+  <!-- Script de verificação de autenticação via API utilizando cookies (sessão) -->
+  <script>
+    (async function() {
+      const BASE_URL = "https://superpro2025.onrender.com";
+      try {
+        // A requisição enviará automaticamente os cookies (credentials: "include")
+        const response = await fetch(`${BASE_URL}/api/validateUser`, {
+          method: "GET",
+          credentials: "include"
+        });
+        if (!response.ok) {
+          // Se a resposta não for 200, redireciona
+          window.location.href = "index.html";
+          return;
+        }
+        const result = await response.json();
+        // Se a resposta não indicar que o usuário é válido, redireciona
+        if (!result.valid) {
+          window.location.href = "index.html";
+        }
+      } catch (error) {
+        console.error("Erro na validação do usuário:", error);
+        window.location.href = "index.html";
+      }
+    })();
+  </script>
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h1 class="logo">SuperPro</h1>
+      <!-- Botão de fechar (X) - exibido somente na versão mobile -->
+      <button class="close-btn" id="close-btn" aria-label="Fechar Sidebar">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li>
+          <a href="index3.html" aria-label="Home">
+            <i class="fas fa-home"></i>
+            Página Inicial
+          </a>
+        </li>
+        <li>
+          <a href="jogos.html" aria-label="Explorar Jogos">
+            <i class="fas fa-compass"></i>
+            Explorar Jogos
+          </a>
+        </li>
+        <li>
+          <a href="dicas.html" aria-label="Dicas Inteligência Avançadas">
+            <i class="fas fa-lightbulb"></i>
+            Dicas Inteligência Avançada
+          </a>
+        </li>
+        <li>
+          <!-- O link "Sair" pode, se desejado, limpar dados de sessão e redirecionar -->
+          <a href="index.html" class="logout-btn" aria-label="Sair" onclick="/* Opcional: limpe cookies se necessário */">
+            <i class="fas fa-sign-out-alt"></i>
+            Sair
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- Overlay para Mobile -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Botão de Menu para Mobile -->
+  <button class="menu-btn" id="menu-btn" aria-label="Abrir Sidebar">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Conteúdo Principal -->
+  <div class="main-content">
+    <!-- Cabeçalho -->
+    <header class="header">
+      <div class="header-logo">
+        <a href="index3.html" aria-label="SuperPro Home">
+          <span class="logo-text">SuperPro</span>
+        </a>
+      </div>
+    </header>
+
+    <!-- Conteúdo (Widget de Jogos) -->
+    <main class="feed" id="feed">
+      <div id="wg-api-football-games"
+           data-host="v3.football.api-sports.io"
+           data-key="b77014eeea8142d354a2e0479bcc2d08"
+           data-date="" <!-- Será definido automaticamente -->
+           data-league="39" <!-- Premier League -->
+           data-season="2025" <!-- Temporada 2025 -->
+           data-theme="light" <!-- Pode ser "grey", "dark" ou "false" para customizar com CSS -->
+           data-refresh="15"
+           data-show-toolbar="true"
+           data-show-errors="true" <!-- Habilitado para depuração -->
+           data-show-logos="true"
+           data-modal-game="true"
+           data-modal-standings="true"
+           data-modal-show-logos="true">
+      </div>
+      <script>
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+        const widget = document.getElementById('wg-api-football-games');
+        widget.setAttribute('data-date', formattedDate);
+      </script>
+      <script type="module" src="https://widgets.api-sports.io/2.0.3/widgets.js"></script>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      © 2025 SuperPro. Todos os direitos reservados.
+    </footer>
+  </div>
+
+  <!-- Scripts para funcionamento da Sidebar -->
+  <script>
+    const botaoMenu = document.getElementById('menu-btn');
+    const botaoFechar = document.getElementById('close-btn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    // Abre a sidebar e oculta o botão de menu (mobile)
+    function abrirSidebar() {
+      sidebar.classList.add('active');
+      overlay.classList.add('active');
+      botaoMenu.style.display = 'none';
+    }
+
+    // Fecha a sidebar e mostra o botão de menu
+    function fecharSidebar() {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+      botaoMenu.style.display = 'block';
+    }
+
+    if (botaoMenu) {
+      botaoMenu.addEventListener('click', abrirSidebar);
+    }
+    if (botaoFechar) {
+      botaoFechar.addEventListener('click', fecharSidebar);
+    }
+    if (overlay) {
+      overlay.addEventListener('click', fecharSidebar);
+    }
+  </script>
+</body>
+</html>

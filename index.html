@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <!-- Google Tag Manager (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-16728337981"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'AW-16728337981');
+    </script>
+
+    <!-- Metadados Básicos -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <!-- Metadados para Mobile -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="keywords" content="dicas esportivas, análises esportivas, apostas esportivas, futebol, basquete, esportes" />
+    <meta name="description" content="Bem-vindo(a) à SportsTips - Sua fonte confiável de dicas e análises esportivas." />
+    <meta name="author" content="SportsTips" />
+
+    <title>SportsTips - Dicas e Análises Esportivas de Confiança</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+
+    <!-- Ícones de Favicon -->
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <link rel="icon" type="image/png" href="favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="favicon-32x32.png" sizes="32x32">
+
+    <!-- Fontes do Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+
+    <!-- Estilos Personalizados -->
+    <style>
+      /* Estilos Globais */
+      body {
+        font-family: "Open Sans", sans-serif;
+        color: #0c0c0c;
+        background-color: #ffffff;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+      }
+
+      /* Cabeçalho */
+      header {
+        background-color: #ffffff;
+        color: #333333;
+        height: 88px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #FFD700; /* Borda dourada */
+        padding: 0 20px;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        z-index: 1000;
+      }
+
+      /* Logo à esquerda */
+      .logo img {
+        width: 150px;
+      }
+
+      /* Menu de Navegação para versão web */
+      nav {
+        margin: 0 20px;
+      }
+
+      nav ul {
+        list-style: none;
+        display: flex;
+        margin: 0;
+        padding: 0;
+      }
+
+      nav ul li {
+        margin-left: 20px;
+      }
+
+      nav ul li a {
+        color: #333333;
+        text-decoration: none;
+        font-weight: bold;
+        text-transform: uppercase;
+        transition: color 0.3s;
+        padding: 5px 10px;
+        border-radius: 5px;
+      }
+
+      nav ul li a:hover {
+        color: #28a745;
+      }
+
+      /* Botão de Login/Registrar */
+      .btn-custom-login-register {
+        background-color: #28a745; /* Verde suave */
+        color: #ffffff;
+        border: 2px solid #FFD700; /* Borda dourada */
+        padding: 8px 16px;
+        font-size: 16px;
+        font-weight: bold;
+        text-transform: uppercase;
+        border-radius: 5px;
+        transition: background-color 0.3s, transform 0.2s;
+        text-decoration: none;
+      }
+
+      .btn-custom-login-register:hover {
+        background-color: #218838;
+        transform: scale(1.05);
+      }
+
+      .btn-custom-login-register:active {
+        background-color: #1e7e34;
+        transform: scale(0.98);
+      }
+
+      /* Seção de Herói */
+      .hero_section {
+        background-color: #28a745; /* Verde suave */
+        color: #ffffff;
+        height: 70vh;
+        display: flex;
+        align-items: center;
+        text-align: center;
+        position: relative;
+        margin-top: 88px; /* Espaço para o cabeçalho fixo */
+        padding: 20px;
+      }
+
+      .hero_section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(40, 167, 69, 0.8);
+        z-index: 1;
+      }
+
+      .hero_section .container {
+        position: relative;
+        z-index: 2;
+      }
+
+      .hero_section h1 {
+        font-size: 48px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .hero_section p {
+        font-size: 20px;
+        margin-bottom: 30px;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+      }
+
+      .hero_section .btn-primary {
+        background-color: #FFD700; /* Dourado */
+        color: #333333;
+        border: none;
+        padding: 12px 24px;
+        font-size: 18px;
+        border-radius: 5px;
+        transition: background-color 0.3s, color 0.3s;
+        text-decoration: none;
+      }
+
+      .hero_section .btn-primary:hover {
+        background-color: #FFC107;
+        color: #ffffff;
+      }
+
+      /* Seção de Serviços */
+      .service_section {
+        background-color: #f8f9fa;
+        padding: 60px 0;
+        text-align: center;
+      }
+
+      .service_section .heading_container h2 {
+        font-size: 36px;
+        margin-bottom: 40px;
+        position: relative;
+      }
+
+      .service_section .heading_container h2::after {
+        content: "";
+        width: 60px;
+        height: 4px;
+        background-color: #FFD700;
+        display: block;
+        margin: 10px auto 0;
+        border-radius: 2px;
+      }
+
+      .service_section .service_container .row {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+      }
+
+      .service_section .service_container .box {
+        background-color: #ffffff;
+        padding: 20px;
+        margin: 10px;
+        flex: 1 1 30%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        transition: transform 0.3s, border 0.3s;
+        min-height: 300px;
+        border: 1px solid #FFD700;
+      }
+
+      .service_section .service_container .box:hover {
+        transform: scale(1.05);
+        border-color: #28a745;
+      }
+
+      .service_section .service_container .box .img-box {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .service_section .service_container .box .img-box i {
+        color: #28a745;
+        font-size: 48px;
+      }
+
+      .service_section .service_container .box .detail-box h5 {
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        color: #28a745;
+      }
+
+      .service_section .service_container .box .detail-box p {
+        font-size: 16px;
+        color: #6c757d;
+      }
+
+      /* Seção de Depoimentos */
+      .testimonials_section {
+        background-color: #ffffff;
+        padding: 60px 0;
+        text-align: center;
+      }
+
+      .testimonials_section .heading_container h2 {
+        font-size: 36px;
+        margin-bottom: 40px;
+        position: relative;
+      }
+
+      .testimonials_section .heading_container h2::after {
+        content: "";
+        width: 60px;
+        height: 4px;
+        background-color: #FFD700;
+        display: block;
+        margin: 10px auto 0;
+        border-radius: 2px;
+      }
+
+      .testimonials_section .testimonial_container .row {
+        display: flex;
+        justify-content: space-around;
+        flex-wrap: wrap;
+      }
+
+      .testimonials_section .testimonial_container .testimonial_box {
+        background-color: #f8f9fa;
+        padding: 20px;
+        margin: 10px;
+        flex: 1 1 30%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        transition: transform 0.3s;
+        min-height: 250px;
+        position: relative;
+      }
+
+      .testimonials_section .testimonial_container .testimonial_box:hover {
+        transform: scale(1.05);
+      }
+
+      .testimonials_section .testimonial_container .testimonial_box .quote {
+        font-size: 18px;
+        font-style: italic;
+        margin-bottom: 15px;
+        color: #333333;
+      }
+
+      .testimonials_section .testimonial_container .testimonial_box .client_info {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .testimonials_section .testimonial_container .testimonial_box .client_info img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        margin-right: 15px;
+        object-fit: cover;
+      }
+
+      .testimonials_section .testimonial_container .testimonial_box .client_info .client_name {
+        font-weight: bold;
+        color: #28a745;
+      }
+
+      /* Seção de Perguntas Frequentes (FAQ) */
+      .faq_section {
+        background-color: #f8f9fa;
+        padding: 60px 0;
+        text-align: center;
+      }
+
+      .faq_section .heading_container h2 {
+        font-size: 36px;
+        margin-bottom: 40px;
+        position: relative;
+      }
+
+      .faq_section .heading_container h2::after {
+        content: "";
+        width: 60px;
+        height: 4px;
+        background-color: #FFD700;
+        display: block;
+        margin: 10px auto 0;
+        border-radius: 2px;
+      }
+
+      .faq_section .faq_container .row {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .faq_section .faq_container .faq_box {
+        background-color: #ffffff;
+        padding: 20px;
+        margin: 10px;
+        flex: 1 1 60%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        transition: transform 0.3s;
+      }
+
+      .faq_section .faq_container .faq_box:hover {
+        transform: scale(1.02);
+      }
+
+      .faq_section .faq_container .faq_box .question {
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #28a745;
+      }
+
+      .faq_section .faq_container .faq_box .answer {
+        color: #6c757d;
+      }
+
+      /* Seção de Informações */
+      .info_section {
+        background-color: #f8f9fa;
+        padding: 60px 0;
+      }
+
+      .info_section .container .row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+      }
+
+      .info_section .info_col {
+        flex: 1 1 220px;
+        margin: 10px;
+        color: #333333;
+      }
+
+      .info_section .info_col h4 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #28a745;
+      }
+
+      .info_section .contact_link_box a {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+        color: #333333;
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+
+      .info_section .contact_link_box a:hover {
+        color: #28a745;
+      }
+
+      .info_section .contact_link_box a i {
+        font-size: 20px;
+        margin-right: 10px;
+        color: #FFD700;
+      }
+
+      .info_section .info_links a {
+        display: block;
+        color: #333333;
+        text-decoration: none;
+        margin-bottom: 10px;
+        transition: color 0.3s;
+      }
+
+      .info_section .info_links a:hover {
+        color: #28a745;
+      }
+
+      .info_section .info_links a i {
+        margin-right: 8px;
+      }
+
+      .info_section .info_col p {
+        font-size: 16px;
+        color: #6c757d;
+      }
+
+      .info_section .info_col form {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .info_section .info_col form input[type="email"] {
+        padding: 10px;
+        border: 1px solid #FFD700;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        font-size: 16px;
+      }
+
+      .info_section .info_col form button {
+        padding: 10px;
+        background-color: #28a745;
+        color: #ffffff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+      }
+
+      .info_section .info_col form button:hover {
+        background-color: #218838;
+      }
+
+      /* Rodapé */
+      footer {
+        background-color: #ffffff;
+        padding: 20px 0;
+        border-top: 2px solid #FFD700;
+      }
+
+      footer p {
+        margin: 0;
+        color: #6c757d;
+        font-size: 16px;
+      }
+
+      footer .social_links {
+        margin-top: 10px;
+      }
+
+      footer .social_links a {
+        color: #6c757d;
+        margin: 0 10px;
+        font-size: 20px;
+        transition: color 0.3s;
+      }
+
+      footer .social_links a:hover {
+        color: #28a745;
+      }
+
+      /* Responsividade para Mobile */
+      @media (max-width: 768px) {
+        /* Na versão mobile, a tag <nav> é ocultada */
+        nav {
+          display: none;
+        }
+
+        /* Ajusta o tamanho do logo para dispositivos menores */
+        .logo img {
+          width: 120px;
+        }
+
+        /* Ajusta a seção de herói para evitar que o texto seja cortado pelo cabeçalho */
+        .hero_section {
+          margin-top: 110px; /* Aumenta a margem superior para compensar o cabeçalho */
+        }
+
+        .hero_section h1 {
+          font-size: 32px;
+        }
+
+        .hero_section p {
+          font-size: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body id="top">
+    <!-- Cabeçalho com Logo, Menu de Navegação (apenas na versão web) e Botão de Login -->
+    <header>
+      <div class="logo">
+        <a href="#top">
+          <img src="Superpro-removebg-preview.png" alt="Logo SuperPro" />
+        </a>
+      </div>
+      <!-- Menu de Navegação (exibido apenas na versão web) -->
+      <nav>
+        <ul>
+          <li><a href="#top">Home</a></li>
+          <li><a href="#services">Serviços</a></li>
+          <li><a href="#testimonials">Depoimentos</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="index2.html">Login</a></li>
+          <li><a href="#contact">Contato</a></li>
+        </ul>
+      </nav>
+      <!-- Botão de Login (exibido em todas as versões) -->
+      <a href="index2.html" class="btn-custom-login-register">Login</a>
+    </header>
+
+    <!-- Seção de Herói -->
+    <section class="hero_section">
+      <div class="container">
+        <h1>Maximize Suas Chances com Nossas Dicas Esportivas</h1>
+        <p>Receba análises especializadas e dicas atualizadas para apostas esportivas mais inteligentes.</p>
+        <a href="index2.html" class="btn btn-primary">Comece Agora</a>
+      </div>
+    </section>
+
+    <!-- Seção de Serviços -->
+    <section class="service_section" id="services">
+      <div class="container">
+        <div class="heading_container">
+          <h2>Nossos <span>Serviços</span></h2>
+          <p>Descubra como nossas soluções podem ajudar você a vencer nas apostas esportivas!</p>
+        </div>
+        <div class="service_container">
+          <div class="row">
+            <!-- Caixa de Dicas Personalizadas -->
+            <div class="box">
+              <div class="img-box">
+                <i class="fas fa-lightbulb fa-3x"></i>
+              </div>
+              <div class="detail-box">
+                <h5>Dicas Personalizadas</h5>
+                <p>Receba dicas exclusivas baseadas em análises detalhadas e estatísticas atualizadas.</p>
+              </div>
+            </div>
+            <!-- Caixa de Análises Profundas -->
+            <div class="box">
+              <div class="img-box">
+                <i class="fas fa-chart-line fa-3x"></i>
+              </div>
+              <div class="detail-box">
+                <h5>Análises Profundas</h5>
+                <p>Estude nossas análises completas de jogos e jogadores para tomar decisões informadas.</p>
+              </div>
+            </div>
+            <!-- Caixa de Suporte Especializado -->
+            <div class="box">
+              <div class="img-box">
+                <i class="fas fa-headset fa-3x"></i>
+              </div>
+              <div class="detail-box">
+                <h5>Suporte Especializado</h5>
+                <p>Nossa equipe está disponível para ajudar você a otimizar suas estratégias de apostas.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção de Depoimentos -->
+    <section class="testimonials_section" id="testimonials">
+      <div class="container">
+        <div class="heading_container">
+          <h2>O que <span>Nossos Clientes Dizem</span></h2>
+          <p>Veja como ajudamos nossos clientes a alcançarem melhores resultados nas apostas esportivas.</p>
+        </div>
+        <div class="testimonial_container">
+          <div class="row">
+            <div class="testimonial_box">
+              <p class="quote">"As dicas da SportsTips me ajudaram a aumentar meus ganhos em 50% em apenas um mês!"</p>
+              <div class="client_info">
+                <img src="foto01.jpg" alt="João Silva" />
+                <div class="client_name">João Silva</div>
+              </div>
+            </div>
+            <div class="testimonial_box">
+              <p class="quote">"As análises profundas são incríveis! Nunca me senti tão confiante em minhas apostas."</p>
+              <div class="client_info">
+                <img src="foto02.jpg" alt="Maria Oliveira" />
+                <div class="client_name">Maria Oliveira</div>
+              </div>
+            </div>
+            <div class="testimonial_box">
+              <p class="quote">"O suporte especializado da equipe SportsTips é excepcional. Sempre prontos para ajudar."</p>
+              <div class="client_info">
+                <img src="foto03.jpg" alt="Carlos Pereira" />
+                <div class="client_name">Carlos Pereira</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção de Perguntas Frequentes (FAQ) -->
+    <section class="faq_section" id="faq">
+      <div class="container">
+        <div class="heading_container">
+          <h2>Perguntas <span>Frequentes</span></h2>
+          <p>Encontre respostas para as dúvidas mais comuns sobre nossos serviços.</p>
+        </div>
+        <div class="faq_container">
+          <div class="row">
+            <div class="faq_box">
+              <div class="question">
+                <i class="fas fa-question-circle"></i> Como funciona a validação de minhas dicas?
+              </div>
+              <div class="answer">
+                Nossas dicas são baseadas em análises estatísticas detalhadas e são constantemente revisadas para garantir precisão e confiabilidade.
+              </div>
+            </div>
+            <div class="faq_box">
+              <div class="question">
+                <i class="fas fa-question-circle"></i> É seguro compartilhar minhas informações pessoais?
+              </div>
+              <div class="answer">
+                Sim, garantimos a segurança de todos os dados dos nossos usuários utilizando criptografia e seguindo as melhores práticas de segurança.
+              </div>
+            </div>
+            <div class="faq_box">
+              <div class="question">
+                <i class="fas fa-question-circle"></i> Como posso cancelar minha assinatura?
+              </div>
+              <div class="answer">
+                Você pode cancelar sua assinatura a qualquer momento acessando sua conta e seguindo as instruções na seção de configurações.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção de Informações -->
+    <section class="info_section" id="contact">
+      <div class="container">
+        <div class="row">
+          <!-- Coluna de Contato -->
+          <div class="info_col">
+            <h4>Contato</h4>
+            <div class="contact_link_box">
+              <a href="#">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>São Paulo, Brasil</span>
+              </a>
+              <a href="mailto:contato@sportstips.com">
+                <i class="fas fa-envelope"></i>
+                <span>contato@sportstips.com</span>
+              </a>
+              <a href="tel:+5511999999999">
+                <i class="fas fa-phone"></i>
+                <span>+55 (11) 99999-9999</span>
+              </a>
+            </div>
+          </div>
+          <!-- Coluna Sobre Nós -->
+          <div class="info_col">
+            <h4>Sobre Nós</h4>
+            <p>
+              A SportsTips é líder em fornecer dicas e análises esportivas precisas para ajudar você a maximizar suas apostas.
+            </p>
+          </div>
+          <!-- Coluna de Links Úteis -->
+          <div class="info_col">
+            <h4>Links Úteis</h4>
+            <div class="info_links">
+              <a href="#top">Home</a>
+              <a href="#services">Serviços</a>
+              <a href="#testimonials">Depoimentos</a>
+              <a href="#faq">FAQ</a>
+              <a href="index2.html">Login</a>
+              <a href="#contact">Contato</a>
+            </div>
+          </div>
+          <!-- Coluna de Inscrição -->
+          <div class="info_col">
+            <h4>Inscreva-se</h4>
+            <form id="subscribeForm">
+              <input type="email" placeholder="Digite seu e-mail" required />
+              <button type="submit">Inscrever</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer>
+      <div class="container">
+        <p>
+          &copy; <span id="currentYear"></span> SportsTips. Todos os Direitos Reservados.
+        </p>
+        <div class="social_links">
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- jQuery e Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript Personalizado -->
+    <script>
+      // Atualiza o ano no rodapé
+      document.getElementById('currentYear').innerText = new Date().getFullYear();
+
+      // Validação simples de inscrição
+      document.getElementById('subscribeForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const email = this.querySelector('input').value;
+        alert('Obrigado por se inscrever! Você receberá nossas atualizações no seu email.');
+        this.reset();
+      });
+    </script>
+  </body>
+</html>
