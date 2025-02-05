@@ -21,11 +21,11 @@
 
     /* Variáveis de Cores */
     :root {
-      --cor-primaria: #10b981;
-      --cor-secundaria: #34d399;
-      --cor-accent: #2563eb;
-      --cor-fundo: #f3f4f6;
-      --cor-texto: #1f2937;
+      --cor-primaria: #10b981; /* Verde */
+      --cor-secundaria: #34d399; /* Verde Claro */
+      --cor-accent: #2563eb; /* Azul Claro */
+      --cor-fundo: #f3f4f6; /* Cinza Claro */
+      --cor-texto: #1f2937; /* Cinza Escuro */
       --cor-branca: #ffffff;
       --color-sidebar-fundo: var(--cor-primaria);
       --color-sidebar-texto: var(--cor-branca);
@@ -52,11 +52,13 @@
       z-index: 1000;
     }
 
+    /* Cabeçalho da Sidebar */
     .sidebar-header {
       background: rgba(0, 0, 0, 0.2);
       padding: 20px;
       border-radius: 4px;
       margin-bottom: 30px;
+      /* No desktop, o layout é apenas o título centralizado */
       text-align: center;
     }
 
@@ -66,6 +68,7 @@
       margin: 0;
     }
 
+    /* Botão de fechar (X) - não exibido por padrão (desktop) */
     .sidebar-header .close-btn {
       background: none;
       border: none;
@@ -134,6 +137,7 @@
       overflow-y: auto;
     }
 
+    /* Cabeçalho */
     .header {
       background-color: var(--cor-cabecalho-fundo);
       color: var(--cor-branca);
@@ -149,6 +153,7 @@
       justify-content: center;
     }
 
+    /* Botão de Menu para Mobile */
     .menu-btn {
       display: none;
       background: none;
@@ -162,6 +167,7 @@
       z-index: 1100;
     }
 
+    /* Logo no Cabeçalho */
     .header-logo {
       display: flex;
       align-items: center;
@@ -180,6 +186,9 @@
       font-weight: 700;
     }
 
+    /* ===============================
+       Responsividade
+    =============================== */
     @media (max-width: 1024px) {
       .sidebar {
         width: 220px;
@@ -217,6 +226,7 @@
       .header {
         margin-bottom: 20px;
       }
+      /* Na versão mobile, exibe e reposiciona o botão fechar */
       .sidebar-header {
         display: flex;
         align-items: center;
@@ -232,6 +242,9 @@
       }
     }
 
+    /* ===============================
+       Footer
+    =============================== */
     .footer {
       height: 40px;
       background-color: var(--cor-primaria);
@@ -247,33 +260,6 @@
 
   <!-- Favicon (vazio para evitar erro 404) -->
   <link rel="icon" href="data:,">
-  
-  <!-- Script de verificação de autenticação via API utilizando cookies (sessão) -->
-  <script>
-    (async function() {
-      const BASE_URL = "https://superpro2025.onrender.com";
-      try {
-        // A requisição enviará automaticamente os cookies (credentials: "include")
-        const response = await fetch(`${BASE_URL}/api/validateUser`, {
-          method: "GET",
-          credentials: "include"
-        });
-        if (!response.ok) {
-          // Se a resposta não for 200, redireciona
-          window.location.href = "index.html";
-          return;
-        }
-        const result = await response.json();
-        // Se a resposta não indicar que o usuário é válido, redireciona
-        if (!result.valid) {
-          window.location.href = "index.html";
-        }
-      } catch (error) {
-        console.error("Erro na validação do usuário:", error);
-        window.location.href = "index.html";
-      }
-    })();
-  </script>
 </head>
 <body>
   <!-- Sidebar -->
@@ -302,12 +288,11 @@
         <li>
           <a href="dicas.html" aria-label="Dicas Inteligência Avançadas">
             <i class="fas fa-lightbulb"></i>
-            Dicas Inteligência Avançada
+            Dicas Inteligência Avançadas
           </a>
         </li>
         <li>
-          <!-- O link "Sair" pode, se desejado, limpar dados de sessão e redirecionar -->
-          <a href="index.html" class="logout-btn" aria-label="Sair" onclick="/* Opcional: limpe cookies se necessário */">
+          <a href="#" class="logout-btn" aria-label="Sair">
             <i class="fas fa-sign-out-alt"></i>
             Sair
           </a>
