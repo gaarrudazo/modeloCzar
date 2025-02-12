@@ -319,7 +319,6 @@
         .sidebar.active {
           transform: translateX(0);
         }
-        /* O botão hamburger é exibido somente em telas pequenas */
       }
     </style>
   </head>
@@ -353,7 +352,6 @@
             </a>
           </li>
           <li>
-            <!-- Adicionado o id "logout-btn" para identificar o botão de Sair -->
             <a href="#" id="logout-btn">
               <i class="fas fa-sign-out-alt"></i>
               Sair
@@ -415,11 +413,9 @@
         return year + "-" + month + "-" + day;
       }
 
-      // Função para registrar logs na página
-      var logDiv = document.getElementById("log");
+      // Função para registrar logs na página (caso exista um elemento com id "log")
       function log(msg) {
-        logDiv.textContent += msg + "\n";
-        logDiv.scrollTop = logDiv.scrollHeight;
+        console.log(msg);
       }
 
       // Função para buscar dicas via servidor proxy
@@ -448,10 +444,13 @@
         var url = "https://v3.football.api-sports.io/fixtures?team=" + teamId + "&season=" + season + "&last=30";
         try {
           log("Buscando dados históricos para o time ID " + teamId + "...");
-          var response = await fetch(url, { method: "GET", headers: {
-            "x-rapidapi-host": "v3.football.api-sports.io",
-            "x-rapidapi-key": "b77014eeea8142d354a2e0479bcc2d08"
-          }});
+          var response = await fetch(url, { 
+            method: "GET", 
+            headers: {
+              "x-rapidapi-host": "v3.football.api-sports.io",
+              "x-rapidapi-key": "b77014eeea8142d354a2e0479bcc2d08"
+            }
+          });
           if (!response.ok) {
             throw new Error("Erro: " + response.status);
           }
@@ -494,10 +493,13 @@
         var url = "https://v3.football.api-sports.io/fixtures/headtohead?h2h=" + teamAId + "-" + teamBId + "&season=" + season + "&last=15";
         try {
           log("Buscando head-to-head para " + teamAId + " vs " + teamBId + "...");
-          var response = await fetch(url, { method: "GET", headers: {
-            "x-rapidapi-host": "v3.football.api-sports.io",
-            "x-rapidapi-key": "b77014eeea8142d354a2e0479bcc2d08"
-          }});
+          var response = await fetch(url, { 
+            method: "GET", 
+            headers: {
+              "x-rapidapi-host": "v3.football.api-sports.io",
+              "x-rapidapi-key": "b77014eeea8142d354a2e0479bcc2d08"
+            }
+          });
           if (!response.ok) {
             throw new Error("Erro: " + response.status);
           }
@@ -713,17 +715,33 @@
           
           // Logotipo do time da casa
           var homeLogo = document.createElement("img");
-          homeLogo.src = prediction.homeLogo ? prediction.homeLogo.replace(/\\\//g, "/") : "https://via.placeholder.com/50?text=Casa";
+          var homeLogoUrl = prediction.homeLogo 
+            ? prediction.homeLogo.replace(/\\\//g, "/") 
+            : "https://via.placeholder.com/50?text=Casa";
+          console.log("Logo Time Casa:", homeLogoUrl);
+          homeLogo.src = homeLogoUrl;
           homeLogo.alt = prediction.homeTeam || "Time da Casa";
+          homeLogo.loading = "lazy";
+          homeLogo.onerror = function() {
+            this.src = "https://via.placeholder.com/50?text=Casa";
+          };
           cardHeader.appendChild(homeLogo);
           
           // Logotipo do time visitante
           var awayLogo = document.createElement("img");
-          awayLogo.src = prediction.awayLogo ? prediction.awayLogo.replace(/\\\//g, "/") : "https://via.placeholder.com/50?text=Fora";
+          var awayLogoUrl = prediction.awayLogo 
+            ? prediction.awayLogo.replace(/\\\//g, "/") 
+            : "https://via.placeholder.com/50?text=Fora";
+          console.log("Logo Time Visitante:", awayLogoUrl);
+          awayLogo.src = awayLogoUrl;
           awayLogo.alt = prediction.awayTeam || "Time Visitante";
+          awayLogo.loading = "lazy";
+          awayLogo.onerror = function() {
+            this.src = "https://via.placeholder.com/50?text=Fora";
+          };
           cardHeader.appendChild(awayLogo);
           
-          // Informações dos times e competição (a data foi removida visualmente)
+          // Informações dos times e competição
           var teamInfo = document.createElement("div");
           teamInfo.className = "team-info";
           var title = document.createElement("h2");
@@ -865,7 +883,7 @@
           // Exemplo de lógica de logout:
           // Remover token de autenticação (se houver) do localStorage
           localStorage.removeItem("authToken");
-          // Redirecionar para a página de login (substitua "login.html" pela URL desejada)
+          // Redirecionar para a página de login (substitua "index.html" pela URL desejada)
           window.location.href = "index.html";
         });
       });

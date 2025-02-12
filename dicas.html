@@ -342,7 +342,7 @@
       
       <!-- Seção de Logs -->
       <section class="search-section">
-        <h3>Logs:</h3>
+        <h3>Algoritmo:</h3>
         <div id="log" class="log"></div>
       </section>
       
@@ -354,428 +354,460 @@
     <!-- ==============================
          Script com a Lógica Completa
     ============================== -->
-    <script>
-      // Função para obter a data atual no formato "AAAA-MM-DD"
-      function obterDataAtual() {
-        var dataHoje = new Date();
-        var ano = dataHoje.getFullYear();
-        var mes = String(dataHoje.getMonth() + 1).padStart(2, "0");
-        var dia = String(dataHoje.getDate()).padStart(2, "0");
-        return ano + "-" + mes + "-" + dia;
+  <script>
+  // Função para obter a data atual no formato "AAAA-MM-DD"
+  const obterDataAtual = () => {
+    const dataHoje = new Date();
+    const ano = dataHoje.getFullYear();
+    const mes = String(dataHoje.getMonth() + 1).padStart(2, "0");
+    const dia = String(dataHoje.getDate()).padStart(2, "0");
+    return `${ano}-${mes}-${dia}`;
+  };
+
+  // === Configurações das APIs ===
+  // Utilizamos um servidor proxy para acessar a API sem expor a chave
+  const URL_BASE = "https://superpro2025.onrender.com";
+  // A API do BetMiner é acessada via nosso servidor proxy e a API‑Sports permanece para dados históricos
+  const URL_FUTEBOL_BASE = "https://v3.football.api-sports.io";
+  const CABECALHOS_FUTEBOL = {
+    "x-rapidapi-host": "v3.football.api-sports.io",
+    "x-rapidapi-key": "b77014eeea8142d354a2e0479bcc2d08"
+  };
+
+  // === Função para registrar mensagens de log na página ===
+  const divLog = document.getElementById("log");
+  const registrarLog = (mensagem) => {
+    divLog.textContent += mensagem + "\n";
+    divLog.scrollTop = divLog.scrollHeight;
+  };
+
+  // === Cache para evitar requisições repetidas ===
+  const cacheDadosHistoricos = new Map();
+  const cacheConfrontosDiretos = new Map();
+
+  // === Função para buscar os jogos do dia através do nosso servidor proxy ===
+  const buscarJogosDiarios = async () => {
+    const dataHoje = obterDataAtual();
+    const endpoint = `/api/sports?dateFrom=${encodeURIComponent(dataHoje)}&dateTo=${encodeURIComponent(dataHoje)}`;
+    const urlCompleta = URL_BASE + endpoint;
+    try {
+      registrarLog("Buscando jogos do dia...");
+      const resposta = await fetch(urlCompleta, { method: "GET" });
+      if (!resposta.ok) {
+        throw new Error(`Erro: ${resposta.status}`);
       }
+      const dados = await resposta.json();
+      registrarLog(`Jogos recebidos: ${Array.isArray(dados) ? dados.length : 0}`);
+      return dados;
+    } catch (erro) {
+      registrarLog(`Erro ao buscar jogos: ${erro}`);
+      return [];
+    }
+  };
 
-      // === Configurações das APIs ===
-      // Utilizamos um servidor proxy para acessar a API sem expor a chave
-      const URL_BASE = "https://superpro2025.onrender.com";
-      // A API do BetMiner agora será acessada via nosso servidor proxy; portanto, o endpoint correto é a rota do proxy
-      // API‑Sports permanece inalterada para dados históricos
-      const URL_FUTEBOL_BASE = "https://v3.football.api-sports.io";
-      const CABECALHOS_FUTEBOL = {
-        "x-rapidapi-host": "v3.football.api-sports.io",
-        "x-rapidapi-key": "b77014eeea8142d354a2e0479bcc2d08"
-      };
-
-      // === Função para registrar mensagens de log na página ===
-      var divLog = document.getElementById("log");
-      function registrarLog(mensagem) {
-        divLog.textContent += mensagem + "\n";
-        divLog.scrollTop = divLog.scrollHeight;
+  // === Função para buscar dados históricos reais de uma equipe através da API‑Sports com cache ===
+  const buscarDadosHistoricosEquipe = async (identificadorEquipe) => {
+    if (cacheDadosHistoricos.has(identificadorEquipe)) {
+      return cacheDadosHistoricos.get(identificadorEquipe);
+    }
+    const temporada = 2024; // Temporada de exemplo
+    const urlCompleta = `${URL_FUTEBOL_BASE}/fixtures?team=${identificadorEquipe}&season=${temporada}&last=30`;
+    try {
+      registrarLog(`Buscando dados históricos para o time com identificador ${identificadorEquipe}...`);
+      const resposta = await fetch(urlCompleta, { method: "GET", headers: CABECALHOS_FUTEBOL });
+      if (!resposta.ok) {
+        throw new Error(`Erro: ${resposta.status}`);
       }
-
-      // === Função para buscar os jogos do dia através do nosso servidor proxy ===
-      async function buscarJogosDiarios() {
-        // Utiliza a data atual para buscar as dicas do dia vigente
-        var dataHoje = obterDataAtual();
-        var endpoint = "/api/sports?dateFrom=" + encodeURIComponent(dataHoje) + "&dateTo=" + encodeURIComponent(dataHoje);
-        var urlCompleta = URL_BASE + endpoint;
-        try {
-          registrarLog("Buscando jogos do dia...");
-          var resposta = await fetch(urlCompleta, { method: "GET" });
-          if (!resposta.ok) {
-            throw new Error("Erro: " + resposta.status);
-          }
-          var dados = await resposta.json();
-          registrarLog("Jogos recebidos: " + (Array.isArray(dados) ? dados.length : 0));
-          return dados;
-        } catch (erro) {
-          registrarLog("Erro ao buscar jogos: " + erro);
-          return [];
-        }
-      }
-
-      // === Função para buscar dados históricos reais de uma equipe através da API‑Sports ===
-      async function buscarDadosHistoricosEquipe(identificadorEquipe) {
-        var temporada = 2024; // Temporada de exemplo
-        var urlCompleta = URL_FUTEBOL_BASE + "/fixtures?team=" + identificadorEquipe + "&season=" + temporada + "&last=30";
-        try {
-          registrarLog("Buscando dados históricos para o time de identificador " + identificadorEquipe + "...");
-          var resposta = await fetch(urlCompleta, { method: "GET", headers: CABECALHOS_FUTEBOL });
-          if (!resposta.ok) {
-            throw new Error("Erro: " + resposta.status);
-          }
-          var dados = await resposta.json();
-          var vitorias = 0, empates = 0, derrotas = 0, golsAFavor = 0, golsContra = 0;
-          if (Array.isArray(dados.response)) {
-            dados.response.forEach(function(fixture) {
-              if (fixture.fixture.status.short === "FT") {
-                var placarTime = 0, placarAdversario = 0;
-                if (fixture.teams.home.id === identificadorEquipe) {
-                  placarTime = fixture.goals.home;
-                  placarAdversario = fixture.goals.away;
-                } else if (fixture.teams.away.id === identificadorEquipe) {
-                  placarTime = fixture.goals.away;
-                  placarAdversario = fixture.goals.home;
-                }
-                golsAFavor += placarTime;
-                golsContra += placarAdversario;
-                if (placarTime > placarAdversario) {
-                  vitorias++;
-                } else if (placarTime === placarAdversario) {
-                  empates++;
-                } else {
-                  derrotas++;
-                }
-              }
-            });
-          }
-          // Valores padrão para ranking, campeonatos e forma, se não fornecidos
-          var classificacao = 0;
-          var campeonatosGanhados = 0;
-          var formaRecente = "";
-          return {
-            jogos: 30,
-            vitorias: vitorias,
-            empates: empates,
-            derrotas: derrotas,
-            golsFavor: golsAFavor,
-            golsContra: golsContra,
-            ranking: classificacao,
-            campeonatosGanhados: campeonatosGanhados,
-            form: formaRecente
-          };
-        } catch (erro) {
-          registrarLog("Erro ao buscar dados históricos para o time " + identificadorEquipe + ": " + erro);
-          return {
-            jogos: 30,
-            vitorias: 0,
-            empates: 0,
-            derrotas: 0,
-            golsFavor: 0,
-            golsContra: 0,
-            ranking: 0,
-            campeonatosGanhados: 0,
-            form: ""
-          };
-        }
-      }
-
-      // === Função para buscar confrontos diretos (head-to-head) reais (últimos 15 confrontos) através da API‑Sports ===
-      async function buscarConfrontoDireto(identificadorTimeA, identificadorTimeB) {
-        var temporada = 2024;
-        var urlCompleta = URL_FUTEBOL_BASE + "/fixtures/headtohead?h2h=" + identificadorTimeA + "-" + identificadorTimeB + "&season=" + temporada + "&last=15";
-        try {
-          registrarLog("Buscando confronto direto para " + identificadorTimeA + " versus " + identificadorTimeB + "...");
-          var resposta = await fetch(urlCompleta, { method: "GET", headers: CABECALHOS_FUTEBOL });
-          if (!resposta.ok) {
-            throw new Error("Erro: " + resposta.status);
-          }
-          var dados = await resposta.json();
-          var vitoriasTimeA = 0, vitoriasTimeB = 0, empates = 0;
-          if (Array.isArray(dados.response)) {
-            dados.response.forEach(function(fixture) {
-              if (fixture.fixture.status.short === "FT") {
-                if (fixture.teams.home.id === identificadorTimeA) {
-                  if (fixture.goals.home > fixture.goals.away) {
-                    vitoriasTimeA++;
-                  } else if (fixture.goals.home < fixture.goals.away) {
-                    vitoriasTimeB++;
-                  } else {
-                    empates++;
-                  }
-                } else if (fixture.teams.home.id === identificadorTimeB) {
-                  if (fixture.goals.home > fixture.goals.away) {
-                    vitoriasTimeB++;
-                  } else if (fixture.goals.home < fixture.goals.away) {
-                    vitoriasTimeA++;
-                  } else {
-                    empates++;
-                  }
-                }
-              }
-            });
-          }
-          return {
-            jogos: 15,
-            winsA: vitoriasTimeA,
-            winsB: vitoriasTimeB,
-            draws: empates
-          };
-        } catch (erro) {
-          registrarLog("Erro ao buscar confronto direto: " + erro);
-          return {
-            jogos: 15,
-            winsA: 0,
-            winsB: 0,
-            draws: 0
-          };
-        }
-      }
-
-      // === Função para converter a forma (por exemplo, "WWLWD") em escore numérico ===
-      function converterFormaEmEscore(formaString) {
-        if (!formaString) {
-          return 0;
-        }
-        var escore = 0;
-        for (var indice = 0; indice < formaString.length; indice++) {
-          var caractere = formaString.charAt(indice);
-          if (caractere === "W") {
-            escore += 1;
-          } else if (caractere === "L") {
-            escore -= 1;
-          }
-        }
-        return escore;
-      }
-
-      // === Função Avançada para calcular o índice de confiança baseado na dica ===
-      function calcularIndiceDeConfiancaComBaseNaDica(jogo, equipeA, equipeB, confrontoDireto) {
-        var dica = jogo["1x2"];
-        // 1. Probabilidades implícitas a partir das odds do mercado
-        var oddCasa = parseFloat(jogo.home_win_odds) || 0;
-        var oddEmpate = parseFloat(jogo.draw_odds) || 0;
-        var oddFora = parseFloat(jogo.away_win_odds) || 0;
-        var probabilidadeCasa = oddCasa > 0 ? 1 / oddCasa : 0;
-        var probabilidadeEmpate = oddEmpate > 0 ? 1 / oddEmpate : 0;
-        var probabilidadeFora = oddFora > 0 ? 1 / oddFora : 0;
-        var somaProbabilidades = probabilidadeCasa + probabilidadeEmpate + probabilidadeFora;
-        var probabilidadeNormalizadaCasa = somaProbabilidades > 0 ? probabilidadeCasa / somaProbabilidades : 0;
-        var probabilidadeNormalizadaEmpate = somaProbabilidades > 0 ? probabilidadeEmpate / somaProbabilidades : 0;
-        var probabilidadeNormalizadaFora = somaProbabilidades > 0 ? probabilidadeFora / somaProbabilidades : 0;
-        
-        // 2. Probabilidade base de acordo com a dica
-        var probabilidadeBase = 0;
-        if (dica === "1") {
-          probabilidadeBase = probabilidadeNormalizadaCasa;
-        } else if (dica === "X") {
-          probabilidadeBase = probabilidadeNormalizadaEmpate;
-        } else if (dica === "2") {
-          probabilidadeBase = probabilidadeNormalizadaFora;
-        } else if (dica === "1X") {
-          probabilidadeBase = probabilidadeNormalizadaCasa + probabilidadeNormalizadaEmpate;
-        } else if (dica === "2X") {
-          probabilidadeBase = probabilidadeNormalizadaFora + probabilidadeNormalizadaEmpate;
-        } else if (dica === "12") {
-          probabilidadeBase = probabilidadeNormalizadaCasa + probabilidadeNormalizadaFora;
-        } else {
-          probabilidadeBase = 0;
-        }
-        
-        // 3. Ajustes históricos e contextuais
-        var taxaDeVitoriasEquipeA = equipeA.vitorias / equipeA.jogos;
-        var taxaDeVitoriasEquipeB = equipeB.vitorias / equipeB.jogos;
-        var ajusteTaxa = (taxaDeVitoriasEquipeA - taxaDeVitoriasEquipeB) / 2;
-        
-        var diferencaGolsEquipeA = (equipeA.golsFavor - equipeA.golsContra) / equipeA.jogos;
-        var diferencaGolsEquipeB = (equipeB.golsFavor - equipeB.golsContra) / equipeB.jogos;
-        var ajusteGols = (diferencaGolsEquipeA - diferencaGolsEquipeB) / 10;
-        
-        var ajusteConfrontoDireto = 0;
-        if (confrontoDireto.jogos > 0) {
-          if (dica === "1" || dica === "1X") {
-            ajusteConfrontoDireto = ((confrontoDireto.winsA - confrontoDireto.winsB) / confrontoDireto.jogos) * 0.1;
-          } else if (dica === "2" || dica === "2X") {
-            ajusteConfrontoDireto = ((confrontoDireto.winsB - confrontoDireto.winsA) / confrontoDireto.jogos) * 0.1;
-          }
-        }
-        
-        var ajusteRanking = 0;
-        if (dica === "1" || dica === "1X") {
-          ajusteRanking = (equipeB.ranking - equipeA.ranking) / 100;
-        } else if (dica === "2" || dica === "2X") {
-          ajusteRanking = (equipeA.ranking - equipeB.ranking) / 100;
-        }
-        
-        var ajusteTitulos = 0;
-        if (dica === "1" || dica === "1X") {
-          ajusteTitulos = (equipeA.campeonatosGanhados - equipeB.campeonatosGanhados) / 50;
-        } else if (dica === "2" || dica === "2X") {
-          ajusteTitulos = (equipeB.campeonatosGanhados - equipeA.campeonatosGanhados) / 50;
-        }
-        
-        var formaEquipeA = converterFormaEmEscore(equipeA.form || "");
-        var formaEquipeB = converterFormaEmEscore(equipeB.form || "");
-        var ajusteForma = (formaEquipeA - formaEquipeB) / 10;
-        
-        var ajusteHistorico = ajusteTaxa + ajusteGols + ajusteConfrontoDireto + ajusteRanking + ajusteTitulos + ajusteForma;
-        
-        var probabilidadeAjustada = probabilidadeBase + ajusteHistorico;
-        probabilidadeAjustada = Math.min(Math.max(probabilidadeAjustada, 0), 1);
-        
-        var minhasOdds = probabilidadeAjustada > 0 ? 1 / probabilidadeAjustada : Infinity;
-        var oddDoMercado = parseFloat(obterOddDaDica(jogo));
-        var ajusteOdds = 0;
-        if (minhasOdds !== Infinity && oddDoMercado > 0) {
-          var diferenca = oddDoMercado - minhasOdds;
-          ajusteOdds = (diferenca / oddDoMercado) * 0.1;
-        }
-        
-        var indiceFinal = probabilidadeAjustada + ajusteOdds;
-        indiceFinal = Math.min(Math.max(indiceFinal, 0), 1);
-        return indiceFinal;
-      }
-
-      // === Função para extrair a odd de acordo com a dica ===
-      function obterOddDaDica(jogo) {
-        var dica = jogo["1x2"];
-        var odd;
-        if (dica === "1") {
-          odd = jogo.home_win_odds;
-        } else if (dica === "X") {
-          odd = jogo.draw_odds;
-        } else if (dica === "2") {
-          odd = jogo.away_win_odds;
-        } else if (dica === "12") {
-          odd = jogo["12_odds"];
-        } else if (dica === "1X") {
-          odd = jogo["1x_odds"];
-        } else if (dica === "2X") {
-          odd = jogo["2x_odds"];
-        } else {
-          odd = "N/A";
-        }
-        return odd;
-      }
-
-      // === Função para renderizar os cartões (cards) com os jogos e o índice de confiança ===
-      async function renderizarCartoes(jogos) {
-        var divResultados = document.getElementById("results");
-        divResultados.innerHTML = "";
-        for (var indice = 0; indice < jogos.length; indice++) {
-          var jogo = jogos[indice];
-          // Busca os dados históricos e o confronto direto em paralelo
-          var resultadosDados = await Promise.all([
-            buscarDadosHistoricosEquipe(jogo.homeID),
-            buscarDadosHistoricosEquipe(jogo.awayID),
-            buscarConfrontoDireto(jogo.homeID, jogo.awayID)
-          ]);
-          var equipeA = resultadosDados[0];
-          var equipeB = resultadosDados[1];
-          var confrontoDireto = resultadosDados[2];
-          
-          var confianca = calcularIndiceDeConfiancaComBaseNaDica(jogo, equipeA, equipeB, confrontoDireto);
-          
-          // Alteração na classificação: se a confiança estiver entre 40% e 70%, exibe "Média/Alta Confiança"
-          var classificacao;
-          if (confianca >= 0.70) {
-            classificacao = { texto: "Alta Confiança", classe: "high" };
-          } else if (confianca >= 0.40) {
-            classificacao = { texto: "Média/Alta Confiança", classe: "medium" };
-          } else {
-            classificacao = { texto: "Baixa Confiança", classe: "low" };
-          }
-          
-          var cartao = document.createElement("div");
-          cartao.className = "card";
-          
-          // Cabeçalho: logotipo, times e competição (sem data e horário)
-          var cabecalhoCartao = document.createElement("div");
-          cabecalhoCartao.className = "card-header";
-          var imagemLogoCasa = document.createElement("img");
-          imagemLogoCasa.src = jogo.homeLogo.replace(/\\\//g, "/");
-          imagemLogoCasa.alt = jogo.homeTeam;
-          cabecalhoCartao.appendChild(imagemLogoCasa);
-          var divInformacoes = document.createElement("div");
-          divInformacoes.className = "info";
-          divInformacoes.innerHTML = "<strong>" + jogo.homeTeam + " vs " + jogo.awayTeam + "</strong><br>" +
-                                      "<em>" + jogo.competition_full + "</em>";
-          cabecalhoCartao.appendChild(divInformacoes);
-          cartao.appendChild(cabecalhoCartao);
-          
-          // Corpo: exibe a dica, a odd e as probabilidades
-          var corpoCartao = document.createElement("div");
-          corpoCartao.className = "card-body";
-          var dicaJogo = jogo["1x2"];
-          var oddDaDica = obterOddDaDica(jogo);
-          corpoCartao.innerHTML = "<p><strong>Dica:</strong> " + dicaJogo + "</p>" +
-                                  "<p><strong>Odd da Dica:</strong> " + oddDaDica + "</p>" +
-                                  "<p><strong>Probabilidades:</strong> Casa: " + jogo.home_win + "% | Empate: " + jogo.draw + "% | Fora: " + jogo.away_win + "%</p>";
-          // Se a propriedade "result" estiver presente, exibe se o usuário acertou ou errou a dica
-          if (jogo.result) {
-            var informacaoResultado = document.createElement("p");
-            if (jogo.result === dicaJogo) {
-              informacaoResultado.innerHTML = "<strong>Resultado:</strong> <span class='badge correct'>Acertou</span>";
-            } else {
-              informacaoResultado.innerHTML = "<strong>Resultado:</strong> <span class='badge incorrect'>Errou</span>";
+      const dados = await resposta.json();
+      let vitorias = 0;
+      let empates = 0;
+      let derrotas = 0;
+      let golsAFavor = 0;
+      let golsContra = 0;
+      if (Array.isArray(dados.response)) {
+        dados.response.forEach((fixture) => {
+          if (fixture.fixture.status.short === "FT") {
+            let placarTime = 0;
+            let placarAdversario = 0;
+            if (fixture.teams.home.id === identificadorEquipe) {
+              placarTime = fixture.goals.home;
+              placarAdversario = fixture.goals.away;
+            } else if (fixture.teams.away.id === identificadorEquipe) {
+              placarTime = fixture.goals.away;
+              placarAdversario = fixture.goals.home;
             }
-            corpoCartao.appendChild(informacaoResultado);
+            golsAFavor += placarTime;
+            golsContra += placarAdversario;
+            if (placarTime > placarAdversario) {
+              vitorias++;
+            } else if (placarTime === placarAdversario) {
+              empates++;
+            } else {
+              derrotas++;
+            }
           }
-          cartao.appendChild(corpoCartao);
-          
-          // Rodapé: exibe o índice de confiança e o selo de classificação
-          var rodapeCartao = document.createElement("div");
-          rodapeCartao.className = "card-footer";
-          rodapeCartao.innerHTML = "<span><strong>Índice de Confiança:</strong> " + (confianca * 100).toFixed(2) + "%</span>";
-          var seloConfianca = document.createElement("span");
-          seloConfianca.className = "badge " + classificacao.classe;
-          seloConfianca.textContent = classificacao.texto;
-          rodapeCartao.appendChild(seloConfianca);
-          cartao.appendChild(rodapeCartao);
-          
-          divResultados.appendChild(cartao);
-        }
+        });
+      }
+      // Valores padrão para ranking, campeonatos e forma, se não fornecidos
+      const classificacao = 0;
+      const campeonatosGanhados = 0;
+      const formaRecente = "";
+      const dadosEquipe = {
+        jogos: 30,
+        vitorias: vitorias,
+        empates: empates,
+        derrotas: derrotas,
+        golsFavor: golsAFavor,
+        golsContra: golsContra,
+        ranking: classificacao,
+        campeonatosGanhados: campeonatosGanhados,
+        form: formaRecente
+      };
+      cacheDadosHistoricos.set(identificadorEquipe, dadosEquipe);
+      return dadosEquipe;
+    } catch (erro) {
+      registrarLog(`Erro ao buscar dados históricos para o time ${identificadorEquipe}: ${erro}`);
+      return {
+        jogos: 30,
+        vitorias: 0,
+        empates: 0,
+        derrotas: 0,
+        golsFavor: 0,
+        golsContra: 0,
+        ranking: 0,
+        campeonatosGanhados: 0,
+        form: ""
+      };
+    }
+  };
+
+  // === Função para buscar confrontos diretos (head-to-head) reais (últimos 15 confrontos) através da API‑Sports com cache ===
+  const buscarConfrontoDireto = async (identificadorTimeA, identificadorTimeB) => {
+    const chaveConfronto = `${identificadorTimeA}-${identificadorTimeB}`;
+    if (cacheConfrontosDiretos.has(chaveConfronto)) {
+      return cacheConfrontosDiretos.get(chaveConfronto);
+    }
+    const temporada = 2024;
+    const urlCompleta = `${URL_FUTEBOL_BASE}/fixtures/headtohead?h2h=${identificadorTimeA}-${identificadorTimeB}&season=${temporada}&last=15`;
+    try {
+      registrarLog(`Buscando confronto direto para ${identificadorTimeA} versus ${identificadorTimeB}...`);
+      const resposta = await fetch(urlCompleta, { method: "GET", headers: CABECALHOS_FUTEBOL });
+      if (!resposta.ok) {
+        throw new Error(`Erro: ${resposta.status}`);
+      }
+      const dados = await resposta.json();
+      let vitoriasTimeA = 0;
+      let vitoriasTimeB = 0;
+      let empates = 0;
+      if (Array.isArray(dados.response)) {
+        dados.response.forEach((fixture) => {
+          if (fixture.fixture.status.short === "FT") {
+            if (fixture.teams.home.id === identificadorTimeA) {
+              if (fixture.goals.home > fixture.goals.away) {
+                vitoriasTimeA++;
+              } else if (fixture.goals.home < fixture.goals.away) {
+                vitoriasTimeB++;
+              } else {
+                empates++;
+              }
+            } else if (fixture.teams.home.id === identificadorTimeB) {
+              if (fixture.goals.home > fixture.goals.away) {
+                vitoriasTimeB++;
+              } else if (fixture.goals.home < fixture.goals.away) {
+                vitoriasTimeA++;
+              } else {
+                empates++;
+              }
+            }
+          }
+        });
+      }
+      const dadosConfronto = {
+        jogos: 15,
+        winsA: vitoriasTimeA,
+        winsB: vitoriasTimeB,
+        draws: empates
+      };
+      cacheConfrontosDiretos.set(chaveConfronto, dadosConfronto);
+      return dadosConfronto;
+    } catch (erro) {
+      registrarLog(`Erro ao buscar confronto direto: ${erro}`);
+      return {
+        jogos: 15,
+        winsA: 0,
+        winsB: 0,
+        draws: 0
+      };
+    }
+  };
+
+  // === Função para converter a forma (por exemplo, "WWLWD") em escore numérico ===
+  const converterFormaEmEscore = (formaString) => {
+    if (!formaString) {
+      return 0;
+    }
+    let escore = 0;
+    for (let indice = 0; indice < formaString.length; indice++) {
+      const caractere = formaString.charAt(indice);
+      if (caractere === "W") {
+        escore += 1;
+      } else if (caractere === "L") {
+        escore -= 1;
+      }
+    }
+    return escore;
+  };
+
+  // === Função para extrair a odd de acordo com a dica ===
+  const obterOddDaDica = (jogo) => {
+    const dica = jogo["1x2"];
+    let odd = "N/A";
+    if (dica === "1") {
+      odd = jogo.home_win_odds;
+    } else if (dica === "X") {
+      odd = jogo.draw_odds;
+    } else if (dica === "2") {
+      odd = jogo.away_win_odds;
+    } else if (dica === "12") {
+      odd = jogo["12_odds"];
+    } else if (dica === "1X") {
+      odd = jogo["1x_odds"];
+    } else if (dica === "2X") {
+      odd = jogo["2x_odds"];
+    }
+    return odd;
+  };
+
+  // === Função Avançada para calcular o índice de confiança com ajustes adicionais ===
+  const calcularIndiceDeConfiancaAvancado = (jogo, equipeA, equipeB, confrontoDireto) => {
+    const dica = jogo["1x2"];
+
+    // 1. Probabilidades implícitas a partir das odds do mercado
+    const oddCasa = parseFloat(jogo.home_win_odds) || 0;
+    const oddEmpate = parseFloat(jogo.draw_odds) || 0;
+    const oddFora = parseFloat(jogo.away_win_odds) || 0;
+    const probabilidadeCasa = oddCasa > 0 ? 1 / oddCasa : 0;
+    const probabilidadeEmpate = oddEmpate > 0 ? 1 / oddEmpate : 0;
+    const probabilidadeFora = oddFora > 0 ? 1 / oddFora : 0;
+    const somaProbabilidades = probabilidadeCasa + probabilidadeEmpate + probabilidadeFora;
+    const probabilidadeNormalizadaCasa = somaProbabilidades > 0 ? probabilidadeCasa / somaProbabilidades : 0;
+    const probabilidadeNormalizadaEmpate = somaProbabilidades > 0 ? probabilidadeEmpate / somaProbabilidades : 0;
+    const probabilidadeNormalizadaFora = somaProbabilidades > 0 ? probabilidadeFora / somaProbabilidades : 0;
+
+    let probabilidadeBase = 0;
+    if (dica === "1") {
+      probabilidadeBase = probabilidadeNormalizadaCasa;
+    } else if (dica === "X") {
+      probabilidadeBase = probabilidadeNormalizadaEmpate;
+    } else if (dica === "2") {
+      probabilidadeBase = probabilidadeNormalizadaFora;
+    } else if (dica === "1X") {
+      probabilidadeBase = probabilidadeNormalizadaCasa + probabilidadeNormalizadaEmpate;
+    } else if (dica === "2X") {
+      probabilidadeBase = probabilidadeNormalizadaFora + probabilidadeNormalizadaEmpate;
+    } else if (dica === "12") {
+      probabilidadeBase = probabilidadeNormalizadaCasa + probabilidadeNormalizadaFora;
+    }
+
+    // 2. Ajustes históricos: taxa de vitórias e diferença de gols
+    const taxaVitoriasEquipeA = equipeA.jogos > 0 ? equipeA.vitorias / equipeA.jogos : 0;
+    const taxaVitoriasEquipeB = equipeB.jogos > 0 ? equipeB.vitorias / equipeB.jogos : 0;
+    const ajusteTaxa = (taxaVitoriasEquipeA - taxaVitoriasEquipeB) * 0.5;
+
+    const diferencaGolsEquipeA = equipeA.jogos > 0 ? (equipeA.golsFavor - equipeA.golsContra) / equipeA.jogos : 0;
+    const diferencaGolsEquipeB = equipeB.jogos > 0 ? (equipeB.golsFavor - equipeB.golsContra) / equipeB.jogos : 0;
+    const ajusteGols = (diferencaGolsEquipeA - diferencaGolsEquipeB) * 0.1;
+
+    // 3. Ajuste baseado no confronto direto (head-to-head)
+    let ajusteConfrontoDireto = 0;
+    if (confrontoDireto.jogos > 0) {
+      if (dica === "1" || dica === "1X") {
+        ajusteConfrontoDireto = ((confrontoDireto.winsA - confrontoDireto.winsB) / confrontoDireto.jogos) * 0.1;
+      } else if (dica === "2" || dica === "2X") {
+        ajusteConfrontoDireto = ((confrontoDireto.winsB - confrontoDireto.winsA) / confrontoDireto.jogos) * 0.1;
+      }
+    }
+
+    // 4. Ajustes para ranking e títulos (valores padrão, calibráveis)
+    let ajusteRanking = 0;
+    if (dica === "1" || dica === "1X") {
+      ajusteRanking = (equipeB.ranking - equipeA.ranking) / 100;
+    } else if (dica === "2" || dica === "2X") {
+      ajusteRanking = (equipeA.ranking - equipeB.ranking) / 100;
+    }
+    let ajusteTitulos = 0;
+    if (dica === "1" || dica === "1X") {
+      ajusteTitulos = (equipeA.campeonatosGanhados - equipeB.campeonatosGanhados) / 50;
+    } else if (dica === "2" || dica === "2X") {
+      ajusteTitulos = (equipeB.campeonatosGanhados - equipeA.campeonatosGanhados) / 50;
+    }
+
+    // 5. Ajuste de forma/momentum
+    const formaEquipeA = converterFormaEmEscore(equipeA.form || "");
+    const formaEquipeB = converterFormaEmEscore(equipeB.form || "");
+    const ajusteForma = (formaEquipeA - formaEquipeB) / 10;
+
+    // 6. Ajuste de vantagem de jogar em casa
+    let ajusteVantagemCasa = 0;
+    if (dica === "1" || dica === "1X") {
+      ajusteVantagemCasa = 0.05; // Bônus fixo para o time mandante
+    }
+
+    // 7. Ajuste de momentum extra, se houver diferença significativa na forma
+    const diferencaMomentum = formaEquipeA - formaEquipeB;
+    let ajusteMomentumExtra = 0;
+    if (Math.abs(diferencaMomentum) >= 2) {
+      ajusteMomentumExtra = diferencaMomentum * 0.01;
+    }
+
+    // 8. Ajuste ofensivo: compara média de gols marcados versus média de gols sofridos pelo adversário
+    let ajusteOfensividade = 0;
+    const mediaGolsEquipeA = equipeA.jogos > 0 ? equipeA.golsFavor / equipeA.jogos : 0;
+    const mediaGolsEquipeB = equipeB.jogos > 0 ? equipeB.golsFavor / equipeB.jogos : 0;
+    if (dica === "1" || dica === "1X") {
+      const mediaGolsDefesaAdversaria = equipeB.jogos > 0 ? equipeB.golsContra / equipeB.jogos : 0;
+      ajusteOfensividade = (mediaGolsEquipeA - mediaGolsDefesaAdversaria) * 0.05;
+    } else if (dica === "2" || dica === "2X") {
+      const mediaGolsDefesaAdversaria = equipeA.jogos > 0 ? equipeA.golsContra / equipeA.jogos : 0;
+      ajusteOfensividade = (mediaGolsEquipeB - mediaGolsDefesaAdversaria) * 0.05;
+    }
+
+    // 9. Combinação de todos os ajustes
+    let probabilidadeAjustada = probabilidadeBase +
+                                ajusteTaxa +
+                                ajusteGols +
+                                ajusteConfrontoDireto +
+                                ajusteRanking +
+                                ajusteTitulos +
+                                ajusteForma +
+                                ajusteVantagemCasa +
+                                ajusteMomentumExtra +
+                                ajusteOfensividade;
+    probabilidadeAjustada = Math.min(Math.max(probabilidadeAjustada, 0.05), 1);
+
+    // 10. Ajuste baseado na discrepância entre as odds calculadas e as odds de mercado
+    const minhasOdds = probabilidadeAjustada > 0 ? 1 / probabilidadeAjustada : Infinity;
+    const oddDoMercado = parseFloat(obterOddDaDica(jogo)) || 0;
+    let ajusteOdds = 0;
+    if (minhasOdds !== Infinity && oddDoMercado > 0) {
+      const diferencaOdds = oddDoMercado - minhasOdds;
+      ajusteOdds = (diferencaOdds / oddDoMercado) * 0.1;
+    }
+
+    let indiceFinal = probabilidadeAjustada + ajusteOdds;
+    indiceFinal = Math.min(Math.max(indiceFinal, 0), 1);
+
+    // Registro detalhado para calibração e análise
+    console.log({
+      probabilidadeBase: probabilidadeBase,
+      ajusteTaxa: ajusteTaxa,
+      ajusteGols: ajusteGols,
+      ajusteConfrontoDireto: ajusteConfrontoDireto,
+      ajusteRanking: ajusteRanking,
+      ajusteTitulos: ajusteTitulos,
+      ajusteForma: ajusteForma,
+      ajusteVantagemCasa: ajusteVantagemCasa,
+      ajusteMomentumExtra: ajusteMomentumExtra,
+      ajusteOfensividade: ajusteOfensividade,
+      ajusteOdds: ajusteOdds,
+      indiceFinal: indiceFinal
+    });
+
+    return indiceFinal;
+  };
+
+  // === Função para renderizar os cartões (cards) com os jogos e o índice de confiança de forma incremental ===
+  const renderizarCartoes = async (jogos) => {
+    const divResultados = document.getElementById("results");
+    // Limpa os resultados anteriores
+    divResultados.innerHTML = "";
+    // Para cada jogo, processa os dados e insere o cartão imediatamente
+    for (let indice = 0; indice < jogos.length; indice++) {
+      const jogo = jogos[indice];
+      // Busca os dados históricos e o confronto direto em paralelo
+      const [dadosHistoricosCasa, dadosHistoricosFora, dadosConfronto] = await Promise.all([
+        buscarDadosHistoricosEquipe(jogo.homeID),
+        buscarDadosHistoricosEquipe(jogo.awayID),
+        buscarConfrontoDireto(jogo.homeID, jogo.awayID)
+      ]);
+
+      const confianca = calcularIndiceDeConfiancaAvancado(jogo, dadosHistoricosCasa, dadosHistoricosFora, dadosConfronto);
+
+      // Definição da classificação do índice de confiança
+      let classificacao = { texto: "Baixa Confiança", classe: "low" };
+      if (confianca >= 0.70) {
+        classificacao = { texto: "Alta Confiança", classe: "high" };
+      } else if (confianca >= 0.40) {
+        classificacao = { texto: "Média/Alta Confiança", classe: "medium" };
       }
 
-      // === Evento do Botão: Buscar Jogos e Processar Dados Reais ===
-      document.getElementById("fetchAndProcessBtn").addEventListener("click", async function() {
-        var jogos = await buscarJogosDiarios();
-        if (jogos.length === 0) {
-          registrarLog("Nenhum jogo encontrado.");
-          return;
-        }
-        await renderizarCartoes(jogos);
-      });
+      // Monta o HTML do cartão utilizando template literals
+      const cartaoHTML = `
+        <div class="card">
+          <div class="card-header">
+            <img src="${jogo.homeLogo.replace(/\\\//g, "/")}" alt="${jogo.homeTeam}">
+            <div class="info">
+              <strong>${jogo.homeTeam} vs ${jogo.awayTeam}</strong><br>
+              <em>${jogo.competition_full}</em>
+            </div>
+          </div>
+          <div class="card-body">
+            <p><strong>Dica:</strong> ${jogo["1x2"]}</p>
+            <p><strong>Odd da Dica:</strong> ${obterOddDaDica(jogo)}</p>
+            <p><strong>Probabilidades:</strong> Casa: ${jogo.home_win}% | Empate: ${jogo.draw}% | Fora: ${jogo.away_win}%</p>
+            ${jogo.result ? `<p><strong>Resultado:</strong> <span class="badge ${jogo.result === jogo["1x2"] ? "correct" : "incorrect"}">${jogo.result === jogo["1x2"] ? "Acertou" : "Errou"}</span></p>` : ""}
+          </div>
+          <div class="card-footer">
+            <span><strong>Índice de Confiança:</strong> ${(confianca * 100).toFixed(2)}%</span>
+            <span class="badge ${classificacao.classe}">${classificacao.texto}</span>
+          </div>
+        </div>
+      `;
+      // Cria um container para o cartão e insere-o imediatamente na página
+      const containerCartao = document.createElement("div");
+      containerCartao.innerHTML = cartaoHTML;
+      divResultados.appendChild(containerCartao.firstElementChild);
+    }
+  };
 
-      // === Eventos para a Barra Lateral em Dispositivos Móveis ===
-      var elementoSidebar = document.getElementById("sidebar");
-      var elementoOverlay = document.getElementById("overlay");
-      var botaoMenuMobile = document.getElementById("mobile-menu-btn");
-      var botaoFechar = document.getElementById("close-btn");
+  // === Evento do Botão: Buscar Jogos e Processar Dados Reais ===
+  document.getElementById("fetchAndProcessBtn").addEventListener("click", async () => {
+    const jogos = await buscarJogosDiarios();
+    if (jogos.length === 0) {
+      registrarLog("Nenhum jogo encontrado.");
+      return;
+    }
+    await renderizarCartoes(jogos);
+  });
 
-      botaoMenuMobile.addEventListener("click", function() {
-        elementoSidebar.classList.add("active");
-        elementoOverlay.classList.add("active");
-        // Oculta o botão de menu (hamburger) enquanto a barra lateral estiver aberta
-        botaoMenuMobile.style.display = "none";
-      });
+  // === Eventos para a Barra Lateral em Dispositivos Móveis ===
+  const elementoSidebar = document.getElementById("sidebar");
+  const elementoOverlay = document.getElementById("overlay");
+  const botaoMenuMobile = document.getElementById("mobile-menu-btn");
+  const botaoFechar = document.getElementById("close-btn");
 
-      botaoFechar.addEventListener("click", function() {
-        elementoSidebar.classList.remove("active");
-        elementoOverlay.classList.remove("active");
-        // Exibe novamente o botão de menu ao fechar a barra lateral
-        botaoMenuMobile.style.display = "block";
-      });
+  botaoMenuMobile.addEventListener("click", () => {
+    elementoSidebar.classList.add("active");
+    elementoOverlay.classList.add("active");
+    botaoMenuMobile.style.display = "none"; // Oculta o botão de menu enquanto a barra lateral estiver aberta
+  });
 
-      elementoOverlay.addEventListener("click", function() {
-        elementoSidebar.classList.remove("active");
-        elementoOverlay.classList.remove("active");
-        // Exibe novamente o botão de menu ao fechar a barra lateral
-        botaoMenuMobile.style.display = "block";
+  botaoFechar.addEventListener("click", () => {
+    elementoSidebar.classList.remove("active");
+    elementoOverlay.classList.remove("active");
+    botaoMenuMobile.style.display = "block"; // Exibe novamente o botão de menu
+  });
 
-        // Evento para o botão "Sair" que desloga o usuário
-        var logoutBtn = document.getElementById("logout-btn");
-        logoutBtn.addEventListener("click", function (event) {
-          event.preventDefault();
-          // Exemplo de lógica de logout:
-          // Remover token de autenticação (se houver) do localStorage
-          localStorage.removeItem("authToken");
-          // Redirecionar para a página de login (substitua "login.html" pela URL desejada)
-          window.location.href = "index.html";
-        });
+  elementoOverlay.addEventListener("click", () => {
+    elementoSidebar.classList.remove("active");
+    elementoOverlay.classList.remove("active");
+    botaoMenuMobile.style.display = "block";
+  });
 
-
-        
-      });
-    </script>
-  </body>
-</html>
+  // === Evento para o Botão "Sair" (Logout) – registrado apenas uma vez ===
+  document.getElementById("logout-btn").addEventListener("click", (evento) => {
+    evento.preventDefault();
+    localStorage.removeItem("authToken");
+    window.location.href = "index.html";
+  });
+</script>
