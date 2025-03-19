@@ -323,6 +323,40 @@
     </style>
   </head>
   <body>
+    <!-- Verificação de autenticação -->
+    <script src="js/auth.js"></script>
+    <script>
+      // Verifica autenticação imediatamente
+      if (!isAuthenticated()) {
+        window.location.href = 'index2.html';
+      }
+
+      // Verifica autenticação ao carregar a página
+      document.addEventListener('DOMContentLoaded', () => {
+        // Verifica novamente para garantir
+        if (!isAuthenticated()) {
+          window.location.href = 'index2.html';
+          return;
+        }
+
+        // Exibe o nome do usuário
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user && user.name) {
+          document.getElementById('userName').textContent = `Olá, ${user.name}`;
+        }
+
+        // Inicializa o resto da plataforma
+        initializePlatform();
+      });
+
+      // Função para inicializar a plataforma
+      function initializePlatform() {
+        // Seu código existente de inicialização da plataforma
+        const BASE_URL = "https://api.superproclube.com.br";
+        // ... resto do seu código existente ...
+      }
+    </script>
+
     <!-- Sidebar Personalizada -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
@@ -352,7 +386,7 @@
             </a>
           </li>
           <li>
-            <a href="#" id="logout-btn">
+            <a href="#" onclick="logout(); return false;">
               <i class="fas fa-sign-out-alt"></i>
               Sair
             </a>
@@ -364,7 +398,7 @@
     <!-- Overlay para Mobile -->
     <div class="overlay" id="overlay"></div>
     
-    <!-- Botão de Menu Mobile (apenas visível em telas pequenas) -->
+    <!-- Botão de Menu Mobile (apenas em telas pequenas) -->
     <button class="mobile-menu-btn" id="mobile-menu-btn">
       <i class="fas fa-bars"></i>
     </button>
@@ -402,7 +436,7 @@
     <!-- JavaScript -->
     <script>
       // Utilizamos o servidor proxy para buscar as dicas
-      const BASE_URL = "https://superpro2025.onrender.com";
+      const BASE_URL = "https://api.superproclube.com.br";
       
       // Função para obter a data atual no formato "YYYY-MM-DD"
       function getCurrentDate() {
@@ -425,7 +459,7 @@
         var url = BASE_URL + endpoint;
         try {
           log("Buscando jogos do dia...");
-          var response = await fetch(url, { method: "GET" });
+          var response = await fetch(url, { method: "GET", credentials: 'include' });
           if (!response.ok) {
             throw new Error("Erro: " + response.status);
           }
@@ -679,7 +713,7 @@
           encodeURIComponent(dateFrom) +
           "&dateTo=" +
           encodeURIComponent(dateFrom);
-        fetch(apiUrl)
+        fetch(apiUrl, { credentials: 'include' })
           .then(function (response) {
             if (!response.ok) {
               throw new Error("Erro: " + response.status);
@@ -851,7 +885,7 @@
         return forecast.includes(result);
       }
 
-      // Eventos para a Sidebar Mobile
+      // Eventos para a Sidebar Mobile e Logout
       document.addEventListener("DOMContentLoaded", function () {
         var sidebar = document.getElementById("sidebar");
         var mobileMenuBtn = document.getElementById("mobile-menu-btn");
@@ -876,15 +910,24 @@
           mobileMenuBtn.style.display = "block";
         });
         
-        // Evento para o botão "Sair" que desloga o usuário
+        // Evento para o botão "Sair" que realiza o logout via backend
         var logoutBtn = document.getElementById("logout-btn");
         logoutBtn.addEventListener("click", function (event) {
           event.preventDefault();
-          // Exemplo de lógica de logout:
-          // Remover token de autenticação (se houver) do localStorage
-          localStorage.removeItem("authToken");
-          // Redirecionar para a página de login (substitua "index.html" pela URL desejada)
-          window.location.href = "index.html";
+          fetch('https://superpro2025.onrender.com/api/logout', {
+            method: 'POST',
+            credentials: 'include'
+          })
+          .then(response => {
+            if (response.ok) {
+              window.location.href = 'index2.html';
+            } else {
+              throw new Error('Erro no logout');
+            }
+          })
+          .catch(error => {
+            console.error('Erro ao fazer logout:', error);
+          });
         });
       });
     </script>
